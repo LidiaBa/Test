@@ -2,10 +2,17 @@ package org.example;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.WebResourceRoot;
+import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.Tomcat;
 import lombok.extern.java.Log;
+import org.apache.catalina.webresources.DirResourceSet;
+import org.apache.catalina.webresources.StandardRoot;
+import org.example.controller.HelloController;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.logging.Level;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
@@ -14,15 +21,34 @@ public class Main {
     public static void main(String[] args) {
         // Настройка Tomcat
         Tomcat tomcat = new Tomcat();
-        tomcat.setPort(8080);
-        tomcat.setBaseDir("temp");
-        String contextPath = "/";
+        tomcat.setPort(8081);
+        tomcat.setBaseDir(createTempDir("temp"));
+        tomcat.getConnector();
+        String contextPath = "";
         String docBase = new File(".").getAbsolutePath();
         Context ctx = tomcat.addContext(contextPath, docBase);
-        //Tomcat.addServelet(ctx, "myServelet", new MyServelet());
-        //ctx.addServeletMappingdecoded("/hello", "myServelet");
+        // будем искать все сервелеты отталкиваясь от нашего мейн класса, все грубже пакета org.example;
+        ctx.addLifecycleListener(new ContextConfig());
+        ctx.setParentClassLoader(Main.class.getClassLoader());
+
+        // Tomcat.addServlet(ctx, "myServelet", new HelloController());
+        // ctx.addServletMappingDecoded("/hello", "myServelet");
+
+        File additionWebInfClasses = new File("target/classes");
+        WebResourceRoot resources = new StandardRoot(ctx);
+        resources.addPreResources(new DirResourceSet(resources, "/WEB-INF/classes", additionWebInfClasses.getAbsolutePath(), "/"));
+        ctx.setResources(resources);
+
+        ctx.addServletContainerInitializer(
+                ( c, context) -> {
+                    context.addServlet("jsp", "org.apache.jasper.servlet.JsonServlet");
+                },
+                 null
+        );
+
+
         try {
-            System.out.println("Запуск TomCat на порту 8080");
+            System.out.println("Запуск TomCat на порту 8081");
             tomcat.start();
             // блокируем основной поток
             // ждем пока серсер не скажет остановиться
@@ -31,5 +57,16 @@ public class Main {
         } catch (LifecycleException ex) {
             ex.printStackTrace();
         }
+    }
+
+    private static String createTempDir(String prefix) {
+        try{
+            File tempDir = Files.createTempDirectory(prefix).toFile();
+            tempDir.deleteOnExit();
+            return tempDir.getAbsolutePath();
+        } catch (IOException e) {
+            throw new RuntimeException("Не удалось создать временную директорию", e);
+        }
+
     }
 }
