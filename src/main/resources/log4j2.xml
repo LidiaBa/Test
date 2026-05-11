@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+    <!-- Свойства конфигурации -->
+    <Properties>
+        <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
+        <Property name="LOG_PATH">logs</Property>
+    </Properties>
+
+    <Appenders>
+        <!-- Консольный аппендер -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </Console>
+
+        <!-- Файловый аппендер с ротацией -->
+        <RollingFile name="FileLogger"
+                     fileName="${LOG_PATH}/application.log"
+                     filePattern="${LOG_PATH}/application-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <!-- Ротация по размеру файла -->
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+                <!-- Ротация каждый день -->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30">
+            <Delete basePath=" {LOG_PATH}" maxDepth="1">
+                <IfFileName glob="application-*.log.gz" />
+                <IfLastModified age="30d" />
+            </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+        <!-- Асинхронный аппендер для производительности [citation:9] -->
+        <Async name="AsyncLogger">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="FileLogger"/>
+        </Async>
+    </Appenders>
+
+    <Loggers>
+
+        <!-- Логгер для вашего пакета -->
+        <Logger name="org.example" level="debug" additivity="false">
+            <AppenderRef ref="AsyncLogger"/>
+        </Logger>
+
+        <Logger name="org.apache.catalina" level="INFO" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+        <Logger name="org.apache.tomcat" level="INFO" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+        <!-- Корневой логгер -->
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="FileLogger"/>
+        </Root>
+    </Loggers>
+</Configuration>
