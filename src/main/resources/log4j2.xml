@@ -33,13 +33,13 @@
         <!-- Асинхронный аппендер для производительности [citation:9] -->
         <Async name="AsyncLogger">
             <AppenderRef ref="Console"/>
-            <AppenderRef ref="FileLogger"/>
-        </Async>
-    </Appenders>
+            <!-- <AppenderRef ref="FileLogger"/>  -->
+       </Async>
+   </Appenders>
 
-    <Loggers>
+   <Loggers>
 
-        <!-- Логгер для вашего пакета -->
+       <!-- Логгер для вашего пакета -->
         <Logger name="org.example" level="debug" additivity="false">
             <AppenderRef ref="AsyncLogger"/>
         </Logger>
@@ -55,7 +55,7 @@
         <!-- Корневой логгер -->
         <Root level="info">
             <AppenderRef ref="Console"/>
-            <AppenderRef ref="FileLogger"/>
+            <!--<AppenderRef ref="FileLogger"/>-->
         </Root>
     </Loggers>
 </Configuration>
