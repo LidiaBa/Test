@@ -6,6 +6,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
+import org.example.dto.User;
+import org.example.repository.AuthStorage;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -22,6 +24,8 @@ public class HelloServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        User user = AuthStorage.currentUser.get();
+        log.info(user);
         resp.setContentType("text/plain;charset=UTF-8");
         try (PrintWriter out = resp.getWriter()) {
             out.println("hello");
@@ -30,6 +34,10 @@ public class HelloServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+
+        User user = AuthStorage.currentUser.get();
+        log.info(user);
+
         resp.setContentType("text/plain;charset=UTF-8");
         try (PrintWriter out = resp.getWriter()) {
             out.println("hello");
