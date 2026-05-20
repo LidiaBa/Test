@@ -1,16 +1,19 @@
 package org.example.repository;
 
+import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
 
-public class DatabaseConnection {
-    private final static String url = "jdbc:postgresql://localhost:5432/journal";
-    private final static String user = "postgres";
-    private final static String password = "p@proxima";
-    private static Connection conn;
+public class DatabaseConnection {  // 4 usages | related problem
+    @Getter
+    private final static DatabaseConnection instance = new DatabaseConnection();
+    private final static String url = "jdbc:postgresql://localhost:5432/journal"; // usage
+    private final static String user = "postgres"; // usage
+    private final static String password = "p@proxima"; // usage
+    private static Connection conn; // 3 usages
 
     static {
         try {
@@ -20,8 +23,16 @@ public class DatabaseConnection {
         }
     }
 
+    private DatabaseConnection() { // 1 usage | related problem
+    }
+
     @SneakyThrows
     public Statement getStatement() {
         return conn.createStatement();
+    }
+
+    @SneakyThrows
+    public void close() {
+        conn.close();
     }
 }
