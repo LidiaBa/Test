@@ -10,6 +10,7 @@ import org.example.config.ServiceConf;
 import org.example.dto.Person;
 import org.example.service.BookingService;
 import org.example.type.Mapper;
+import org.example.type.Url;
 
 import java.io.IOException;
 
@@ -20,18 +21,14 @@ public class BookingServlet extends HttpServlet {
     public void init() throws ServletException {
         bookingService = ServiceConf.get("bookingService", BookingService.class);
     }
+
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        var params = req.getParameterMap();
-        if (params.containsKey("id")) {
-            var id = Long.getLong(params.get("id")[0]);
-            if (id != null) {
-            } else {
-                resp.getWriter().print(Mapper.objectMapper.writeValueAsString(bookingService.get(id)));
-                return;
-            }
+        Long id = Url.getId(req.getRequestURI());
+        if (id != null) {
+            resp.getWriter().print(Mapper.objectMapper.writeValueAsString(bookingService.get(id)));
+            return;
         }
-
         resp.getWriter().print(Mapper.objectMapper.writeValueAsString(bookingService.getAll()));
     }
 
@@ -48,38 +45,33 @@ public class BookingServlet extends HttpServlet {
     }
     @Override
     public void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Long id = Url.getId(req.getRequestURI());
+        if (id == null) {
+            resp.setStatus(400);
+            resp.getWriter().print("");
+        }
         try {
             Person person = Mapper.objectMapper.readValue(req.getReader(), Person.class);
+            person.setId(id);
             person = bookingService.update(person);
             resp.getWriter().print(Mapper.objectMapper.writeValueAsString(person));
-        } catch (Exception e){
+        } catch (Exception e) {
             resp.setStatus(400);
             resp.getWriter().print("");
         }
     }
-
     @Override
     public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        var params = req.getParameterMap();
-        if (params.containsKey("id")) {
+        Long id = Url.getId(req.getRequestURI());
+        if (id == null) {
             resp.setStatus(400);
             resp.getWriter().print("");
             return;
         }
 
-        try {
-            Long id = Long.getLong(params.get("id")[0]);
-            bookingService.delete(id);
-            resp.setStatus(203);
-            resp.getWriter().print("");
-        } catch (NumberFormatException e) {
-            resp.setStatus(400);
-            resp.getWriter().print("");
-
-        } catch( RuntimeException e) {
-            resp.setStatus(500);
-            resp.getWriter().print(e.getMessage());
-        }
-
+        bookingService.delete(id);
+        resp.setStatus(203);
+        resp.getWriter().print("");
     }
+
 }

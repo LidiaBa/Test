@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
 
-@WebFilter("/hello")
+@WebFilter({"/hello", "/booking"})
 @Log4j2
 public class AuthFilter implements Filter {
     @Override
