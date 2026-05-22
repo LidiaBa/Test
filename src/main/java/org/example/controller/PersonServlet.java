@@ -1,4 +1,4 @@
-package org.example.servlet;
+package org.example.controller;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
 import org.example.config.ServiceConf;
 import org.example.dto.Person;
-import org.example.service.BookingService;
+import org.example.service.PersonService;
 import org.example.type.Mapper;
 import org.example.type.Url;
 
@@ -16,27 +16,27 @@ import java.io.IOException;
 
 @Log4j2
 @WebServlet("/booking")
-public class BookingServlet extends HttpServlet {
-    private BookingService bookingService;
+public class PersonServlet extends HttpServlet {
+    private PersonService personService;
     public void init() throws ServletException {
-        bookingService = ServiceConf.get("bookingService", BookingService.class);
+        personService = ServiceConf.get(PersonService.class);
     }
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Long id = Url.getId(req.getRequestURI());
         if (id != null) {
-            resp.getWriter().print(Mapper.objectMapper.writeValueAsString(bookingService.get(id)));
+            resp.getWriter().print(Mapper.objectMapper.writeValueAsString(personService.get(id)));
             return;
         }
-        resp.getWriter().print(Mapper.objectMapper.writeValueAsString(bookingService.getAll()));
+        resp.getWriter().print(Mapper.objectMapper.writeValueAsString(personService.getAll()));
     }
 
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             Person person = Mapper.objectMapper.readValue(req.getReader(), Person.class);
-            person = bookingService.create(person);
+            person = personService.create(person);
             resp.getWriter().print(Mapper.objectMapper.writeValueAsString(person));
         } catch (Exception e){
             resp.setStatus(400);
@@ -53,7 +53,7 @@ public class BookingServlet extends HttpServlet {
         try {
             Person person = Mapper.objectMapper.readValue(req.getReader(), Person.class);
             person.setId(id);
-            person = bookingService.update(person);
+            person = personService.update(person);
             resp.getWriter().print(Mapper.objectMapper.writeValueAsString(person));
         } catch (Exception e) {
             resp.setStatus(400);
@@ -69,8 +69,8 @@ public class BookingServlet extends HttpServlet {
             return;
         }
 
-        bookingService.delete(id);
-        resp.setStatus(203);
+        personService.delete(id);
+        resp.setStatus(204);
         resp.getWriter().print("");
     }
 

@@ -32,7 +32,6 @@ public class PersonRepositoryJDBC implements PersonRepository {
     @Override
     public List<Person> getAll() {
         try(var st = connection.getStatement()) {
-            String sql;
             try(ResultSet rs = st.executeQuery( "select * from person")) {
                 List<Person> persons = new ArrayList<>();
                 while (rs.next()) {
@@ -60,8 +59,10 @@ public class PersonRepositoryJDBC implements PersonRepository {
     @Override
     public Person update(Person person) {
         try(var st=connection.getStatement()) {
-            String q =  String.format("update person %s name= %s, email= %s, phone= %s where id=%d",
-                    person.getName(),person.getEmail());
+            String q =  String.format("update person set name= %s, email= %s, where id=%d",
+                    person.getName(),
+                    person.getEmail(),
+                    person.getId());
             log.debug(q);
             st.execute(q);
             return person;

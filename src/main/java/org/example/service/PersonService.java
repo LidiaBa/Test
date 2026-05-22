@@ -4,7 +4,7 @@ import org.example.dto.Person;
 
 import java.util.List;
 
-public interface BookingService {
+public interface PersonService {
     Person create(Person person);
     List<Person> getAll();
     Person get(Long id);

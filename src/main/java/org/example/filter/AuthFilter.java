@@ -5,7 +5,6 @@ import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.log4j.Log4j;
 import lombok.extern.log4j.Log4j2;
 import org.example.dto.User;
 import org.example.exception.MyServletException;
@@ -16,7 +15,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
 
-@WebFilter({"/hello", "/booking"})
+@WebFilter({"/hello", "/person"})
 @Log4j2
 public class AuthFilter implements Filter {
     @Override

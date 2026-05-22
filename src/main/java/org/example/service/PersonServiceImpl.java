@@ -5,9 +5,9 @@ import org.example.repository.PersonRepository;
 
 import java.util.List;
 
-public class BookingServiceImpl implements BookingService{
+public class PersonServiceImpl implements PersonService {
     private final PersonRepository personRepository;
-    public BookingServiceImpl(PersonRepository personRepository){
+    public PersonServiceImpl(PersonRepository personRepository){
         this.personRepository = personRepository;
     }
 
