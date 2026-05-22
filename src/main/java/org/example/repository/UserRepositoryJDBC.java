@@ -16,7 +16,8 @@ public class UserRepositoryJDBC implements UserRepository {
     @Override
     public User create(User user) {
        try(var st=connection.getStatement()) {
-        String q =  String.format("insert into users (name) values (%s)", user.getName());
+        String q =  String.format("INSERT INTO users (login, password, name, roles) VALUES  ('%s', '%s', '%s', '%s')",
+                user.getLogin(),user.getPassword(),user.getName(),user.getRoles()!= null ? user.getRoles() : "USER");
         log.debug(q);
         try (var rs = st.executeQuery(q)) {
             if (rs.rowInserted()) {

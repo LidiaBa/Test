@@ -1,6 +1,5 @@
 package org.example.repository;
 import lombok.extern.log4j.Log4j2;
-import lombok.extern.log4j.Log4j2;
 import org.example.dto.Booking;
 import org.example.dto.Wish;
 
@@ -9,6 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+@Log4j2
 public class BookingRepositoryJDBC implements BookingRepository{
     private final DatabaseConnection connection = DatabaseConnection.getInstance();
 
@@ -19,7 +19,7 @@ public class BookingRepositoryJDBC implements BookingRepository{
                     booking.getWishId(),
                     booking.getUserId(),
                     booking.getOwnerId());
-           // log.debug(q);
+            log.debug(q);
             try (var rs = st.executeQuery(q)) {
                 if (rs.rowInserted()) {
                     booking.setId(st.getGeneratedKeys().getLong(1));
@@ -48,7 +48,7 @@ public class BookingRepositoryJDBC implements BookingRepository{
     @Override
     public List<Booking> getAll() {
         try(var st = connection.getStatement()) {
-            String sql;
+            //String sql;
             try(ResultSet rs = st.executeQuery( "select * from bookings")) {
                 List<Booking> bookings = new ArrayList<>();
                 while (rs.next()) {
@@ -72,7 +72,7 @@ public class BookingRepositoryJDBC implements BookingRepository{
                     booking.getUserId(),
                     booking.getOwnerId(),
                     booking.getId());
-          //  log.debug(q);
+            log.debug(q);
             st.execute(q);
             return booking;
         } catch (SQLException e) {
@@ -84,7 +84,7 @@ public class BookingRepositoryJDBC implements BookingRepository{
     public void delete(Long id) {
         try(var st=connection.getStatement()) {
             String q =  String.format("delete from bookings where id=%d", id);
-            //log.debug(q);
+            log.debug(q);
             st.execute(q);
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -113,7 +113,7 @@ public class BookingRepositoryJDBC implements BookingRepository{
     @Override
     public List<Booking> getByUserId(Long userId) {
         try (var st = connection.getStatement()) {
-            String sql;
+            //String sql;
             try (ResultSet rs = st.executeQuery(String.format("select * from bookings where user_id =%d ", userId))) {
                 List<Booking> bookings = new ArrayList<>();
                 while (rs.next()) {
@@ -150,7 +150,7 @@ public class BookingRepositoryJDBC implements BookingRepository{
     public void deleteByWishId(Long wishId) {
         try(var st=connection.getStatement()) {
             String q =  String.format("delete from bookings where wish_id=%d", wishId);
-            //log.debug(q);
+            log.debug(q);
             st.execute(q);
         } catch (SQLException e) {
             throw new RuntimeException(e);

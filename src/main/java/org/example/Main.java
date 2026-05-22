@@ -9,10 +9,12 @@ import org.apache.catalina.webresources.DirResourceSet;
 import org.apache.catalina.webresources.StandardRoot;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.example.repository.DatabaseConnection;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.sql.Connection;
 
 
 public class Main {

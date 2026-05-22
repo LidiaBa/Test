@@ -10,9 +10,9 @@ import java.sql.Statement;
 public class DatabaseConnection {  // 4 usages | related problem
     @Getter
     private final static DatabaseConnection instance = new DatabaseConnection();
-    private final static String url = "jdbc:postgresql://localhost:5432/journal"; // usage
+    private final static String url = "jdbc:postgresql://localhost:5432/wishlist"; // usage
     private final static String user = "postgres"; // usage
-    private final static String password = "p@proxima"; // usage
+    private final static String password = "1234"; // usage
     private static Connection conn; // 3 usages
 
     static {

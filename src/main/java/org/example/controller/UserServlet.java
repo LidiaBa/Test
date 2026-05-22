@@ -12,10 +12,11 @@ import org.example.service.UserService;
 import org.example.type.Mapper;
 import org.example.type.Url;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 
 @Log4j2
-@WebServlet("/booking")
+@WebServlet("/user")
 public class UserServlet extends HttpServlet {
     private UserService userService;
     public void init() throws ServletException {
@@ -32,7 +33,7 @@ public class UserServlet extends HttpServlet {
         resp.getWriter().print(Mapper.objectMapper.writeValueAsString(userService.getAll()));
     }
 
-    @Override
+   /* @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             User user = Mapper.objectMapper.readValue(req.getReader(), User.class);
@@ -41,6 +42,35 @@ public class UserServlet extends HttpServlet {
         } catch (Exception e){
             resp.setStatus(400);
             resp.getWriter().print("");
+        }
+    }
+*/
+    @Override
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        try {
+            // Читаем тело запроса
+            StringBuilder sb = new StringBuilder();
+            String line;
+            try (BufferedReader reader = req.getReader()) {
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+            }
+            System.out.println("📥 Received JSON: " + sb.toString());
+
+            User user = Mapper.objectMapper.readValue(sb.toString(), User.class);
+            System.out.println("👤 Parsed user: " + user);
+
+            user = userService.create(user);
+
+            resp.setContentType("application/json");
+            resp.getWriter().print(Mapper.objectMapper.writeValueAsString(user));
+
+        } catch (Exception e) {
+            System.err.println("❌ Error in doPost: " + e.getMessage());
+            e.printStackTrace();  // ← полная ошибка в консоль
+            resp.setStatus(400);
+            resp.getWriter().print("{\"error\":\"" + e.getMessage() + "\"}");
         }
     }
     @Override
