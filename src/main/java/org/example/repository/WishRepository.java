@@ -1,9 +1,7 @@
 package org.example.repository;
 
-import org.example.dto.Person;
 import org.example.dto.Wish;
 import java.util.List;
-import java.util.Optional;
 
 public interface WishRepository {
 

@@ -1,7 +1,7 @@
 package org.example.repository;
 
 import lombok.extern.log4j.Log4j2;
-import org.example.dto.Person;
+import org.example.dto.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,35 +10,34 @@ import java.util.List;
 
 
 @Log4j2
-public class PersonRepositoryJDBC implements PersonRepository {
+public class UserRepositoryJDBC implements UserRepository {
     private final DatabaseConnection connection = DatabaseConnection.getInstance();
 
     @Override
-    public Person create(Person person) {
+    public User create(User user) {
        try(var st=connection.getStatement()) {
-        String q =  String.format("insert into person (name, email) values (%s, %s)", person.getName(),person.getEmail());
+        String q =  String.format("insert into person (name) values (%s)", user.getName());
         log.debug(q);
         try (var rs = st.executeQuery(q)) {
             if (rs.rowInserted()) {
-                person.setId(st.getGeneratedKeys().getLong(1));
+                user.setId(st.getGeneratedKeys().getLong(1));
             }
         }
-        return person;
+        return user;
        } catch (SQLException e) {
            throw new RuntimeException(e);
        }
     }
 
     @Override
-    public List<Person> getAll() {
+    public List<User> getAll() {
         try(var st = connection.getStatement()) {
             try(ResultSet rs = st.executeQuery( "select * from person")) {
-                List<Person> persons = new ArrayList<>();
+                List<User> users = new ArrayList<>();
                 while (rs.next()) {
-                    persons.add(Person.builder().id(rs.getLong( "id")).name(rs.getString( "name"))
-    .email(rs.getString( "email")).build());
+                    users.add(User.builder().id(rs.getLong( "id")).name(rs.getString( "name")).build());
                 }
-                return persons;
+                return users;
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -46,26 +45,24 @@ public class PersonRepositoryJDBC implements PersonRepository {
     }
 
     @Override
-    public Person get(Long id) {
+    public User get(Long id) {
         try (var st = connection.getStatement()) {
             try (ResultSet rs = st.executeQuery(String.format("select * from student where id = %d", id))) {
-                return Person.builder().id(rs.getLong( "id")).name(rs.getString( "name"))
-    .email(rs.getString( "email")).build();
+                return User.builder().id(rs.getLong( "id")).name(rs.getString( "name")).build();
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
     @Override
-    public Person update(Person person) {
+    public User update(User user) {
         try(var st=connection.getStatement()) {
-            String q =  String.format("update person set name= %s, email= %s, where id=%d",
-                    person.getName(),
-                    person.getEmail(),
-                    person.getId());
+            String q =  String.format("update person set name= %s where id=%d",
+                    user.getName(),
+                    user.getId());
             log.debug(q);
             st.execute(q);
-            return person;
+            return user;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

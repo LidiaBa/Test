@@ -1,6 +1,5 @@
 package org.example.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,8 +11,6 @@ import org.example.repository.AuthStorage;
 
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Map;
 
 @WebFilter({"/hello", "/person"})
 @Log4j2

@@ -1,9 +1,9 @@
 package org.example.config;
 
-import org.example.repository.PersonRepository;
-import org.example.repository.PersonRepositoryJDBC;
-import org.example.service.PersonService;
-import org.example.service.PersonServiceImpl;
+import org.example.repository.UserRepository;
+import org.example.repository.UserRepositoryJDBC;
+import org.example.service.UserService;
+import org.example.service.UserServiceImpl;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,10 +15,10 @@ public class ServiceConf {
         private static Map<Class<?>, Object> init() {  // usage
             Map<Class<?>, Object> storage = new ConcurrentHashMap<>();
 
-            PersonRepository studentRepository = new PersonRepositoryJDBC();
-            PersonService studentService = new PersonServiceImpl(studentRepository);
-            storage.put(PersonRepository.class, studentRepository);
-            storage.put(PersonService.class, studentService);
+            UserRepository userRepository = new UserRepositoryJDBC();
+            UserService userService = new UserServiceImpl(userRepository);
+            storage.put(UserRepository.class, userRepository);
+            storage.put(UserService.class, userService);
             return storage;
         }
     }

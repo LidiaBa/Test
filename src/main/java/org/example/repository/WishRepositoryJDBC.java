@@ -1,7 +1,6 @@
 package org.example.repository;
 
 import lombok.extern.log4j.Log4j2;
-import org.example.dto.Person;
 import org.example.dto.Wish;
 
 import java.sql.ResultSet;

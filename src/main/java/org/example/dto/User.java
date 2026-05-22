@@ -12,7 +12,6 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class User {
     private Long id;
     private String name;
@@ -21,3 +20,4 @@ public class User {
     private String password;
     private List<String> roles;
 }
+
