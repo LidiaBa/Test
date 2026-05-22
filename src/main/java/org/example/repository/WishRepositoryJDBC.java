@@ -53,8 +53,8 @@ public class WishRepositoryJDBC implements WishRepository {
     @Override
     public List<Wish> getAll() {
         try(var st = connection.getStatement()) {
-            String sql;
-            try(ResultSet rs = st.executeQuery( "select * from wishes")) {
+            //String sql;
+            try(ResultSet rs = st.executeQuery( "SELECT * FROM wishes")) {
                 List<Wish> wishes = new ArrayList<>();
                 while (rs.next()) {
                     wishes.add(Wish.builder().id(rs.getLong( "id")).
@@ -116,7 +116,7 @@ public class WishRepositoryJDBC implements WishRepository {
     @Override
     public List<Wish> getByUserId(Long userId) {
         try (var st = connection.getStatement()) {
-            String sql;
+            //String sql;
             try (ResultSet rs = st.executeQuery(String.format("select * from wishes where user_id =%d ", userId))) {
                 List<Wish> wishes = new ArrayList<>();
                 while (rs.next()) {

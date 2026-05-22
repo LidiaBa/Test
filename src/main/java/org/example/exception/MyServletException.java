@@ -9,25 +9,25 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
 
-@Log4j2 // no usages
+@Log4j2
 public class MyServletException extends RuntimeException{
-    private final ObjectMapper objectMapper; // usage
-    private final ServletResponse servletResponse; // usage
-    public MyServletException(ServletResponse servletResponse) { // no usages
+    private final ObjectMapper objectMapper;
+    private final ServletResponse servletResponse;
+    public MyServletException(ServletResponse servletResponse) {
         objectMapper = new ObjectMapper();
         this.servletResponse = servletResponse;
     }
-    public MyServletException(ServletResponse servletResponse,Integer status, String message) { // no usages
+    public MyServletException(ServletResponse servletResponse,Integer status, String message) {
         objectMapper = new ObjectMapper();
         this.servletResponse = servletResponse;
         error(status, message);
         log.error(message);
     }
 
-    public void error(Integer status, String message) { // no usages
+    public void error(Integer status, String message) {
         HttpServletResponse res = (HttpServletResponse) servletResponse;
         res.setStatus(status);
-        res.setContentType("application/json;charset=UTF-8"); // [ ]
+        res.setContentType("application/json;charset=UTF-8");
         try (PrintWriter out = res.getWriter()) {
             out.println(objectMapper.writeValueAsString(Map.of(  "error", message)));
         } catch (IOException e) {
