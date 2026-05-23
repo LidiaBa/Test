@@ -12,7 +12,7 @@ import org.example.repository.AuthStorage;
 
 import java.io.IOException;
 
-@WebFilter({"/hello", "/person"})
+@WebFilter({"/hello", "/user", "/wishes", "/bookings"})
 @Log4j2
 public class AuthFilter implements Filter {
     @Override

@@ -7,7 +7,7 @@ import java.util.List;
 public interface WishService {
 
     Wish create(Wish wish);
-    Wish getById(Long id);
+    Wish get(Long id);
     List<Wish> getByUserId(Long userId);
     List<Wish> getAll();
     Wish update(Wish wish, Long currentUserId);

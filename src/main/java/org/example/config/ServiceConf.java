@@ -1,9 +1,7 @@
 package org.example.config;
 
-import org.example.repository.UserRepository;
-import org.example.repository.UserRepositoryJDBC;
-import org.example.service.UserService;
-import org.example.service.UserServiceImpl;
+import org.example.repository.*;
+import org.example.service.*;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,9 +14,20 @@ public class ServiceConf {
             Map<Class<?>, Object> storage = new ConcurrentHashMap<>();
 
             UserRepository userRepository = new UserRepositoryJDBC();
+            WishRepository wishRepository = new WishRepositoryJDBC();
+            BookingRepository bookingRepository = new BookingRepositoryJDBC();
+
             UserService userService = new UserServiceImpl(userRepository);
+            WishService wishService = new WishServiceImpl(wishRepository);
+            BookingService bookingService = new BookingServiceImpl(bookingRepository, wishRepository);
+
             storage.put(UserRepository.class, userRepository);
+            storage.put(WishRepository.class, wishRepository);
+            storage.put(BookingRepository.class, bookingRepository);
+
             storage.put(UserService.class, userService);
+            storage.put(WishService.class, wishService);
+            storage.put(BookingService.class, bookingService);
             return storage;
         }
     }

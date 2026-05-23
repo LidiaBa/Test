@@ -35,7 +35,7 @@ public class WishServiceImpl implements WishService{
     }
 
     @Override
-    public Wish getById(Long id) {
+    public Wish get(Long id) {
         if (id == null) {
             throw new IllegalArgumentException("Wish ID is required");
         }
@@ -69,7 +69,7 @@ public class WishServiceImpl implements WishService{
         }
 
         // Проверяем, что пользователь — владелец желания
-        Wish existing = getById(wish.getId());
+        Wish existing = get(wish.getId());
         if (!existing.getUserId().equals(currentUserId)) {
             throw new SecurityException("You can only edit your own wishes");
         }
@@ -88,7 +88,7 @@ public class WishServiceImpl implements WishService{
         }
 
         // Проверяем, что пользователь — владелец желания
-        Wish existing = getById(id);
+        Wish existing = get(id);
         if (!existing.getUserId().equals(currentUserId)) {
             throw new SecurityException("You can only delete your own wishes");
         }
@@ -103,7 +103,7 @@ public class WishServiceImpl implements WishService{
             throw new IllegalArgumentException("Wish ID is required");
         }
 
-        Wish wish = getById(wishId);
+        Wish wish = get(wishId);
 
         if (!"FREE".equals(wish.getStatus())) {
             throw new IllegalStateException("Wish is already booked");
@@ -119,7 +119,7 @@ public class WishServiceImpl implements WishService{
             throw new IllegalArgumentException("Wish ID is required");
         }
 
-        Wish wish = getById(wishId);
+        Wish wish = get(wishId);
 
         if (!"BOOKED".equals(wish.getStatus())) {
             throw new IllegalStateException("Wish is not booked");
