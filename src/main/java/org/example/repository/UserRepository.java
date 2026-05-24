@@ -8,6 +8,8 @@ public interface UserRepository {
     User create(User user);
     List<User> getAll();
     User get(Long id);
+    User getByLogin(String login);
     User update(User user);
     void delete(Long id);
+
 }

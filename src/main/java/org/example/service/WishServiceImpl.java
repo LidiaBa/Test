@@ -86,9 +86,16 @@ public class WishServiceImpl implements WishService{
         if (id == null) {
             throw new IllegalArgumentException("Wish ID is required");
         }
+        if (currentUserId == null) {
+            throw new IllegalArgumentException("User ID is required");
+        }
 
-        // Проверяем, что пользователь — владелец желания
+        // Проверяем, что желание существует и пользователь — владелец
         Wish existing = get(id);
+        if (existing == null) {
+            throw new RuntimeException("Wish not found with id: " + id);
+        }
+
         if (!existing.getUserId().equals(currentUserId)) {
             throw new SecurityException("You can only delete your own wishes");
         }

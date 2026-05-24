@@ -11,16 +11,20 @@ import org.example.repository.AuthStorage;
 
 
 import java.io.IOException;
+import java.util.Set;
 
-@WebFilter({"/hello", "/user", "/wishes", "/bookings"})
+@WebFilter({"/hello", "/user", "/wishes/*", "/bookings/*"})
+
 @Log4j2
 public class AuthFilter implements Filter {
+    private static final Set<String> PUBLIC_PATHS = Set.of("/auth");
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
-        HttpServletResponse res = (HttpServletResponse) servletResponse;
+        //HttpServletResponse res = (HttpServletResponse) servletResponse;
+
         String auth = req.getHeader("Authorization");
-        if (auth == null || !auth.isEmpty()) {
+        if (auth == null || auth.isEmpty()) {
             throw  new MyServletException(servletResponse, 401, "Authorization error");
         }
         String token = auth;
@@ -30,8 +34,10 @@ public class AuthFilter implements Filter {
         if (usr == null){
             throw  new MyServletException(servletResponse, 401, "User not found");
         }
-        AuthStorage.currentUser.set(usr);
 
+        AuthStorage.currentUser.set(usr);
+        req.setAttribute("userId", usr.getId());
+        req.setAttribute("userid", usr);
         log.debug(usr);
         filterChain.doFilter(servletRequest, servletResponse);
 

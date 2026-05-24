@@ -16,7 +16,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 @Log4j2
-@WebServlet("/user")
+@WebServlet("/user/*")
 public class UserServlet extends HttpServlet {
     private UserService userService;
     public void init() throws ServletException {

@@ -16,7 +16,7 @@ import org.example.type.Url;
 import java.io.IOException;
 import java.util.List;
 @Log4j2
-@WebServlet("/wishes")
+@WebServlet("/bookings/*")
 
 public class BookingServlet extends HttpServlet {
     private BookingService bookingService;
@@ -31,7 +31,7 @@ public class BookingServlet extends HttpServlet {
         resp.setContentType("application/json;charset=UTF-8");
         Long userId = (Long) req.getAttribute("userId");
         String path = req.getPathInfo();
-
+//
         try {
             if ("/for-me".equals(path)) {
                 List<Booking> bookings = bookingService.getBookingsForMe(userId);

@@ -15,28 +15,28 @@ public class UserRepositoryJDBC implements UserRepository {
 
     @Override
     public User create(User user) {
-       try(var st=connection.getStatement()) {
-        String q =  String.format("INSERT INTO users (login, password, name, roles) VALUES  ('%s', '%s', '%s', '%s')",
-                user.getLogin(),user.getPassword(),user.getName(),user.getRoles()!= null ? user.getRoles() : "USER");
-        log.debug(q);
-        try (var rs = st.executeQuery(q)) {
-            if (rs.rowInserted()) {
-                user.setId(st.getGeneratedKeys().getLong(1));
+        try (var st = connection.getStatement()) {
+            String q = String.format("INSERT INTO users (login, password, name, roles) VALUES  ('%s', '%s', '%s', '%s')",
+                    user.getLogin(), user.getPassword(), user.getName(), user.getRoles() != null ? user.getRoles() : "USER");
+            log.debug(q);
+            try (var rs = st.executeQuery(q)) {
+                if (rs.rowInserted()) {
+                    user.setId(st.getGeneratedKeys().getLong(1));
+                }
             }
+            return user;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        return user;
-       } catch (SQLException e) {
-           throw new RuntimeException(e);
-       }
     }
 
     @Override
     public List<User> getAll() {
-        try(var st = connection.getStatement()) {
-            try(ResultSet rs = st.executeQuery( "select * from users")) {
+        try (var st = connection.getStatement()) {
+            try (ResultSet rs = st.executeQuery("select * from users")) {
                 List<User> users = new ArrayList<>();
                 while (rs.next()) {
-                    users.add(User.builder().id(rs.getLong( "id")).name(rs.getString( "name")).build());
+                    users.add(User.builder().id(rs.getLong("id")).name(rs.getString("name")).build());
                 }
                 return users;
             }
@@ -48,17 +48,41 @@ public class UserRepositoryJDBC implements UserRepository {
     @Override
     public User get(Long id) {
         try (var st = connection.getStatement()) {
-            try (ResultSet rs = st.executeQuery(String.format("select * from users where id = %d", id))) {
-                return User.builder().id(rs.getLong( "id")).name(rs.getString( "name")).build();
+            try (ResultSet rs = st.executeQuery(String.format("select * from users where id = '%d'", id))) {
+                if (rs.next()) {
+                    return User.builder().id(rs.getLong("id")).name(rs.getString("name")).build();
+                }
+
+            }
+        } catch(SQLException e) {
+        throw new RuntimeException(e);
+    }
+        return null;
+}
+
+    @Override
+    public User getByLogin(String login) {
+        try (var st = connection.getStatement()) {
+            try (ResultSet rs = st.executeQuery(String.format("select * from users where login = '%s'", login))) {
+                if (rs.next()) {
+                    return User.builder()
+                            .id(rs.getLong("id"))
+                            .login(rs.getString("login"))
+                            .password(rs.getString("password"))
+                            .name(rs.getString("name"))
+                            .roles(rs.getString("roles"))
+                            .build();
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        return null;
     }
     @Override
     public User update(User user) {
         try(var st=connection.getStatement()) {
-            String q =  String.format("update users set name= %s where id=%d",
+            String q =  String.format("update users set name= '%s' where id='%d'",
                     user.getName(),
                     user.getId());
             log.debug(q);
@@ -72,7 +96,7 @@ public class UserRepositoryJDBC implements UserRepository {
     @Override
     public void delete(Long id) {
         try(var st=connection.getStatement()) {
-            String q =  String.format("delete from users where id=%d", id);
+            String q =  String.format("delete from users where id='%d'", id);
             log.debug(q);
             st.execute(q);
         } catch (SQLException e) {

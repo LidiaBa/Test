@@ -1,5 +1,6 @@
 package org.example.repository;
 
+import org.example.config.ServiceConf;
 import org.example.dto.Token;
 import org.example.dto.User;
 
@@ -12,20 +13,17 @@ import java.util.concurrent.ConcurrentHashMap;
 public class AuthStorage { // usages
     private static final AuthStorage instance = new AuthStorage(); // usage
     private final Map<String, Token> tokens = new ConcurrentHashMap<>(0); // no usages
-    private static final List<User> users = List.of( // no usages
-            User.builder().id(1L).login("nx").name("Baca").password("12345678").build()
-    );
     public static ThreadLocal<User> currentUser = new ThreadLocal<>();
     private AuthStorage() {}
 
-    public static AuthStorage getInstance() {
-        return instance;
-    }
+    public static AuthStorage getInstance() {return instance;}
+
     public Token auth(String login, String password) { // no usages
-        for(User user: users){
-            if (user.getLogin().equals(login) && user.getPassword().equals(password)){
-                return generate(user);
-            }
+        UserRepository userRepository = ServiceConf.get(UserRepository.class);
+        User user = userRepository.getByLogin(login);
+
+        if (user != null && user.getPassword().equals(password)) {
+            return generate(user);
         }
         return null;
     }

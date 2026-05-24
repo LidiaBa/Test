@@ -15,7 +15,7 @@ public class WishRepositoryJDBC implements WishRepository {
     @Override
     public Wish create(Wish wish) {
         try(var st=connection.getStatement()) {
-            String q =  String.format("insert into wishes (title, link, image_url, status, price,user_id) values (%s, %s, %s, %s,%d,%d)",
+            String q =  String.format("insert into wishes (title, link, image_url, status, price,user_id) values ('%s', '%s', '%s', '%s','%d','%d')",
                     wish.getTitle(),
                     wish.getLink(),
                     wish.getImageUrl(),
@@ -36,18 +36,21 @@ public class WishRepositoryJDBC implements WishRepository {
     @Override
     public Wish get(Long id) {
         try (var st = connection.getStatement()) {
-            try (ResultSet rs = st.executeQuery(String.format("select * from wishes where id = %d", id))) {
-                return Wish.builder().id(rs.getLong( "id"))
-                        .title(rs.getString( "title"))
-                        .link(rs.getString( "link"))
-                        .imageUrl(rs.getString( "imageUrl"))
-                        .status(rs.getString( "status"))
-                        .price(rs.getInt( "price"))
-                        .userId(rs.getLong( "userId")).build();
+            try (ResultSet rs = st.executeQuery(String.format("select * from wishes where id = '%d'", id))) {
+                if (rs.next()) {
+                    return Wish.builder().id(rs.getLong("id"))
+                            .title(rs.getString("title"))
+                            .link(rs.getString("link"))
+                            .imageUrl(rs.getString("image_url"))
+                            .status(rs.getString("status"))
+                            .price(rs.getInt("price"))
+                            .userId(rs.getLong("user_Id")).build();
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        return null;
     }
 
     @Override
@@ -60,10 +63,10 @@ public class WishRepositoryJDBC implements WishRepository {
                     wishes.add(Wish.builder().id(rs.getLong( "id")).
                             title(rs.getString( "title"))
                             .link(rs.getString( "link"))
-                            .imageUrl(rs.getString( "imageUrl"))
+                            .imageUrl(rs.getString( "image_url"))
                             .status(rs.getString( "status"))
                             .price(rs.getInt( "price"))
-                            .userId(rs.getLong( "userid")).build());
+                            .userId(rs.getLong( "user_id")).build());
                 }
                 return wishes;
             }
@@ -75,11 +78,15 @@ public class WishRepositoryJDBC implements WishRepository {
     @Override
     public Wish update(Wish wish) {
         try(var st=connection.getStatement()) {
-            String q =  String.format("update wishes set title= %s, link= %s, imageUrl= %s, status= %s, price= %d, userid=%d where id=%d",
+            String statusSql = "";
+            if (wish.getStatus() != null) {
+                statusSql = String.format(", status = '%s'", wish.getStatus());
+            }
+            String q = String.format("update wishes set title = '%s', link = '%s', image_url = '%s'%s, price = '%d', user_id = '%d' where id = '%d'",
                     wish.getTitle(),
-                    wish.getLink(),
-                    wish.getImageUrl(),
-                    wish.getStatus(),
+                    wish.getLink() != null ? wish.getLink() : "null",
+                    wish.getImageUrl() != null ? wish.getImageUrl() : "null",
+                    statusSql,
                     wish.getPrice(),
                     wish.getUserId(),
                     wish.getId());
@@ -94,7 +101,7 @@ public class WishRepositoryJDBC implements WishRepository {
     @Override
     public void delete(Long id) {
         try(var st=connection.getStatement()) {
-            String q =  String.format("delete from wishes where id=%d", id);
+            String q =  String.format("delete from wishes where id='%d'", id);
             log.debug(q);
             st.execute(q);
         } catch (SQLException e) {
@@ -108,6 +115,11 @@ public class WishRepositoryJDBC implements WishRepository {
             String q = String.format("UPDATE wishes SET status = '%s' WHERE id = %d", status, id);
             log.debug(q);
             st.execute(q);
+
+            System.out.println("=== updateStatus ===");
+            System.out.println("Wish ID: " + id);
+            System.out.println("New status: " + status);
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -117,16 +129,16 @@ public class WishRepositoryJDBC implements WishRepository {
     public List<Wish> getByUserId(Long userId) {
         try (var st = connection.getStatement()) {
             //String sql;
-            try (ResultSet rs = st.executeQuery(String.format("select * from wishes where user_id =%d ", userId))) {
+            try (ResultSet rs = st.executeQuery(String.format("select * from wishes where user_id ='%d' ", userId))) {
                 List<Wish> wishes = new ArrayList<>();
                 while (rs.next()) {
                     wishes.add(Wish.builder().id(rs.getLong("id"))
                             .title(rs.getString("title"))
                             .link(rs.getString("link"))
-                            .imageUrl(rs.getString("imageUrl"))
+                            .imageUrl(rs.getString("image_url"))
                             .status(rs.getString( "status"))
                             .price(rs.getInt( "price"))
-                            .userId(rs.getLong("userid")).build());
+                            .userId(rs.getLong("user_id")).build());
                 }
                 return wishes;
             }

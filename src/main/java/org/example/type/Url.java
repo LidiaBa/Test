@@ -9,7 +9,7 @@ public class Url {
         String last = urls[urls.length - 1];
         if (last.isEmpty()) last = urls[urls.length - 2];
         try {
-            return Long.getLong(last);
+            return Long.parseLong(last);
         } catch (NumberFormatException e) {
             return null;
         }
