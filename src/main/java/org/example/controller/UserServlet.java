@@ -25,7 +25,9 @@ public class UserServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json;charset=UTF-8");
+        resp.setCharacterEncoding("UTF-8");
         Long id = Url.getId(req.getRequestURI());
         if (id != null) {
             resp.getWriter().print(Mapper.objectMapper.writeValueAsString(userService.get(id)));
@@ -36,7 +38,9 @@ public class UserServlet extends HttpServlet {
 
    @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-       resp.setContentType("application/json;charset=UTF-8");
+        req.setCharacterEncoding("UTF-8");
+        resp.setContentType("application/json;charset=UTF-8");
+        resp.setCharacterEncoding("UTF-8");
         try {
             User user = Mapper.objectMapper.readValue(req.getReader(), User.class);
             user = userService.create(user);
@@ -50,6 +54,7 @@ public class UserServlet extends HttpServlet {
 
     @Override
     public void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json;charset=UTF-8");
         Long id = Url.getId(req.getRequestURI());
         if (id == null) {
@@ -68,7 +73,9 @@ public class UserServlet extends HttpServlet {
     }
     @Override
     public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json;charset=UTF-8");
+        resp.setCharacterEncoding("UTF-8");
         Long id = Url.getId(req.getRequestURI());
         if (id == null) {
             resp.setStatus(400);

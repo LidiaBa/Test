@@ -26,7 +26,9 @@ public class HelloServlet extends HttpServlet {
             throws ServletException, IOException {
         User user = AuthStorage.currentUser.get();
         log.info(user);
-        resp.setContentType("text/plain;charset=UTF-8");
+        req.setCharacterEncoding("UTF-8");
+        resp.setContentType("application/json;charset=UTF-8");
+        resp.setCharacterEncoding("UTF-8");
         try (PrintWriter out = resp.getWriter()) {
             out.println("hello");
         }
@@ -38,7 +40,9 @@ public class HelloServlet extends HttpServlet {
         User user = AuthStorage.currentUser.get();
         log.info(user);
 
-        resp.setContentType("text/plain;charset=UTF-8");
+        req.setCharacterEncoding("UTF-8");
+        resp.setContentType("application/json;charset=UTF-8");
+        resp.setCharacterEncoding("UTF-8");
         try (PrintWriter out = resp.getWriter()) {
             out.println("hello");
         }
@@ -46,7 +50,9 @@ public class HelloServlet extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        resp.setContentType("text/plain;charset=UTF-8");
+        req.setCharacterEncoding("UTF-8");
+        resp.setContentType("application/json;charset=UTF-8");
+        resp.setCharacterEncoding("UTF-8");
         try (PrintWriter out = resp.getWriter()) {
             out.println("hello");
         }
@@ -54,7 +60,9 @@ public class HelloServlet extends HttpServlet {
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        resp.setContentType("text/plain;charset=UTF-8");
+        req.setCharacterEncoding("UTF-8");
+        resp.setContentType("application/json;charset=UTF-8");
+        resp.setCharacterEncoding("UTF-8");
         try (PrintWriter out = resp.getWriter()) {
             out.println("hello");
         }

@@ -32,7 +32,9 @@ public class AuthServlet extends HelloServlet {
             throw new MyServletException(resp, 401, "Не найдено пользователя");
         }
         resp.setStatus(200);
+        req.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json;charset=UTF-8");
+        resp.setCharacterEncoding("UTF-8");
         resp.getWriter().print(Mapper.objectMapper.writeValueAsString(Map.of( "token", token)));
     }
 }

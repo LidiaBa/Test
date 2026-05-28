@@ -27,7 +27,9 @@ public class WishServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json;charset=UTF-8");
+        resp.setCharacterEncoding("UTF-8");
         Long userId = (Long) req.getAttribute("userId");
         Long id = Url.getId(req.getRequestURI());
 
@@ -44,7 +46,9 @@ public class WishServlet extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json;charset=UTF-8");
+        resp.setCharacterEncoding("UTF-8");
 
         Long userId = (Long) req.getAttribute("userId");
         System.out.println("UserId: " + userId);
@@ -62,7 +66,9 @@ public class WishServlet extends HttpServlet {
 
     @Override
     public void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json;charset=UTF-8");
+        resp.setCharacterEncoding("UTF-8");
         Long id = Url.getId(req.getRequestURI());
         Long userId = (Long) req.getAttribute("userId");
         if (id == null) {
@@ -83,7 +89,9 @@ public class WishServlet extends HttpServlet {
 
     @Override
     public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json;charset=UTF-8");
+        resp.setCharacterEncoding("UTF-8");
         Long id = Url.getId(req.getRequestURI());
         Long userId = (Long) req.getAttribute("userId");
         System.out.println("Wish ID: " + id);

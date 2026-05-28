@@ -27,8 +27,9 @@ public class BookingServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-
+        req.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json;charset=UTF-8");
+        resp.setCharacterEncoding("UTF-8");
         Long userId = (Long) req.getAttribute("userId");
         String path = req.getPathInfo();
 //
@@ -51,7 +52,9 @@ public class BookingServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
+        req.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json;charset=UTF-8");
+        resp.setCharacterEncoding("UTF-8");
         Long userId = (Long) req.getAttribute("userId");
         String wishIdParam = req.getParameter("wishId");
 
@@ -85,7 +88,9 @@ public class BookingServlet extends HttpServlet {
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-
+        req.setCharacterEncoding("UTF-8");
+        resp.setContentType("application/json;charset=UTF-8");
+        resp.setCharacterEncoding("UTF-8");
         Long userId = (Long) req.getAttribute("userId");
         String wishIdParam = req.getParameter("wishId");
 
