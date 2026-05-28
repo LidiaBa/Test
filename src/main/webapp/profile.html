@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет - Wish List</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="container">
+    <h1>👤 Личный кабинет</h1>
+
+    <!-- Навигация -->
+    <div class="nav-bar">
+        <a href="/profile.html">🏠 Профиль</a>
+        <a href="/my-wishes.html">🎁 Мои желания</a>
+        <a href="/my-bookings.html">📦 Мои бронирования</a>
+        <a href="/for-me.html">🎀 Кто дарит мне</a>
+        <a href="/users.html">👥 Пользователи</a>
+        <a href="#" onclick="logout()">🚪 Выход</a>
+    </div>
+
+    <!-- Информация о пользователе -->
+    <div class="card">
+        <h2>Информация о профиле</h2>
+        <div class="profile-info">
+            <p><strong>ID:</strong> <span id="user-id"></span></p>
+            <p><strong>Логин:</strong> <span id="user-login"></span></p>
+            <p><strong>Имя:</strong> <span id="user-name"></span></p>
+            <p><strong>Роль:</strong> <span id="user-role"></span></p>
+        </div>
+
+        <button onclick="showEditForm()">✏️ Редактировать профиль</button>
+    </div>
+
+    <!-- Форма редактирования (скрыта по умолчанию) -->
+    <div id="edit-form" class="card" style="display: none;">
+        <h2>Редактирование профиля</h2>
+        <form id="profile-form">
+            <div class="form-group">
+                <label>Имя:</label>
+                <input type="text" id="edit-name" required>
+            </div>
+            <div class="form-group">
+                <label>Новый пароль (оставьте пустым, если не хотите менять):</label>
+                <input type="password" id="edit-password">
+            </div>
+            <button type="submit">Сохранить</button>
+            <button type="button" onclick="hideEditForm()">Отмена</button>
+        </form>
+        <div id="edit-message" class="error"></div>
+    </div>
+
+    <!-- Статистика -->
+    <div class="card">
+        <h2>📊 Моя статистика</h2>
+        <div class="stats">
+            <p>🎁 Моих желаний: <span id="my-wishes-count">0</span></p>
+            <p>📦 Забронировано мной: <span id="my-bookings-count">0</span></p>
+            <p>🎀 Забронировано у меня: <span id="for-me-count">0</span></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+    // Проверка авторизации
+    if (!token) {
+        window.location.href = '/login.html';
+    }
+
+    // Загрузка информации о пользователе
+    async function loadUserInfo() {
+        try {
+            const response = await fetch(`/user/${user.id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (response.ok) {
+                const userData = await response.json();
+                document.getElementById('user-id').innerText = userData.id;
+                document.getElementById('user-login').innerText = userData.login;
+                document.getElementById('user-name').innerText = userData.name;
+                document.getElementById('user-role').innerText = userData.roles || 'USER';
+            }
+        } catch (error) {
+            console.error('Ошибка загрузки профиля:', error);
+        }
+    }
+
+    // Загрузка статистики
+    async function loadStats() {
+        try {
+            // Мои желания
+            const wishesRes = await fetch('/wishes', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const wishes = await wishesRes.json();
+            document.getElementById('my-wishes-count').innerText = wishes.length;
+
+            // Мои бронирования
+            const myBookingsRes = await fetch('/bookings', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const myBookings = await myBookingsRes.json();
+            document.getElementById('my-bookings-count').innerText = myBookings.length;
+
+            // Кто дарит мне
+            const forMeRes = await fetch('/bookings/for-me', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const forMe = await forMeRes.json();
+            document.getElementById('for-me-count').innerText = forMe.length;
+
+        } catch (error) {
+            console.error('Ошибка загрузки статистики:', error);
+        }
+    }
+
+    // Показать форму редактирования
+    function showEditForm() {
+        document.getElementById('edit-name').value = user.name || '';
+        document.getElementById('edit-form').style.display = 'block';
+    }
+
+    // Скрыть форму редактирования
+    function hideEditForm() {
+        document.getElementById('edit-form').style.display = 'none';
+        document.getElementById('edit-message').innerText = '';
+    }
+
+    // Обновление профиля
+    document.getElementById('profile-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById('edit-name').value;
+        const newPassword = document.getElementById('edit-password').value;
+
+        const updateData = { name };
+        if (newPassword) {
+            updateData.password = newPassword;
+        }
+
+        try {
+            const response = await fetch(`/user/${user.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(updateData)
+            });
+
+            if (response.ok) {
+                const updatedUser = await response.json();
+                user.name = updatedUser.name;
+                localStorage.setItem('user', JSON.stringify(user));
+                document.getElementById('user-name').innerText = user.name;
+                document.getElementById('edit-message').innerHTML = '<span class="success">✅ Профиль обновлён!</span>';
+                setTimeout(() => hideEditForm(), 1500);
+            } else {
+                const error = await response.json();
+                document.getElementById('edit-message').innerText = error.error || 'Ошибка обновления';
+            }
+        } catch (error) {
+            document.getElementById('edit-message').innerText = 'Ошибка подключения к серверу';
+        }
+    });
+
+    // Выход
+    function logout() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/';
+    }
+
+    // Загрузка данных
+    loadUserInfo();
+    loadStats();
+</script>
+</body>
+</html>

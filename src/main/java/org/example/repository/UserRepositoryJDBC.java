@@ -5,6 +5,7 @@ import org.example.dto.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,12 +17,21 @@ public class UserRepositoryJDBC implements UserRepository {
     @Override
     public User create(User user) {
         try (var st = connection.getStatement()) {
-            String q = String.format("INSERT INTO users (login, password, name, roles) VALUES  ('%s', '%s', '%s', '%s')",
-                    user.getLogin(), user.getPassword(), user.getName(), user.getRoles() != null ? user.getRoles() : "USER");
+            String q = String.format("INSERT INTO users (login, password, name, roles) VALUES ('%s', '%s', '%s', '%s')",
+                    user.getLogin(),
+                    user.getPassword(),
+                    user.getName(),
+                    user.getRoles() != null ? user.getRoles() : "USER");
             log.debug(q);
-            try (var rs = st.executeQuery(q)) {
-                if (rs.rowInserted()) {
-                    user.setId(st.getGeneratedKeys().getLong(1));
+
+            int affected = st.executeUpdate(q, Statement.RETURN_GENERATED_KEYS);
+            log.debug("Affected rows: {}", affected);
+
+            if (affected > 0) {
+                try (var rs = st.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        user.setId(rs.getLong(1));
+                    }
                 }
             }
             return user;

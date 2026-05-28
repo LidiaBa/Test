@@ -1,12 +1,44 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="ru">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap demo</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wish List - Главная</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-<h1>Hello, world!</h1>
-<header></header>
+<div class="container">
+    <h1>Wish List</h1>
+    <p>Создавайте списки желаний и находите идеальные подарки для друзей!</p>
+
+    <div id="auth-buttons">
+        <button onclick="location.href='/login.html'">Вход</button>
+        <button onclick="location.href='/register.html'">Регистрация</button>
+    </div>
+
+    <div id="user-info" style="display: none;">
+        <p>Добро пожаловать, <span id="user-name"></span>!</p>
+        <button onclick="location.href='/profile.html'">Личный кабинет</button>
+        <button onclick="logout()">Выход</button>
+    </div>
+</div>
+
+<script>
+    // Проверяем, есть ли токен
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+    if (token && user.name) {
+        document.getElementById('auth-buttons').style.display = 'none';
+        document.getElementById('user-info').style.display = 'block';
+        document.getElementById('user-name').innerText = user.name;
+    }
+
+    function logout() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        location.reload();
+    }
+</script>
 </body>
 </html>

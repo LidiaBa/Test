@@ -60,7 +60,7 @@ public class WishServlet extends HttpServlet {
             resp.getWriter().print(Mapper.objectMapper.writeValueAsString(wish));
         } catch (Exception e){
             resp.setStatus(400);
-            resp.getWriter().print("");
+            resp.getWriter().print("{\"error\":\"" + e.getMessage().replace("\"", "\\\"") + "\"}");
         }
     }
 
@@ -83,7 +83,7 @@ public class WishServlet extends HttpServlet {
             resp.getWriter().print(Mapper.objectMapper.writeValueAsString(wish));
         } catch (Exception e) {
             resp.setStatus(400);
-            resp.getWriter().print("");
+            resp.getWriter().print("{\"error\":\"" + e.getMessage().replace("\"", "\\\"") + "\"}");
         }
     }
 

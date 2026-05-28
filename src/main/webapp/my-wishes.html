@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои желания - Wish List</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="container">
+    <h1>🎁 Мои желания</h1>
+
+    <!-- Навигация -->
+    <div class="nav-bar">
+        <a href="/profile.html">🏠 Профиль</a>
+        <a href="/my-wishes.html">🎁 Мои желания</a>
+        <a href="/my-bookings.html">📦 Мои бронирования</a>
+        <a href="/for-me.html">🎀 Кто дарит мне</a>
+        <a href="/users.html">👥 Пользователи</a>
+        <a href="#" onclick="logout()">🚪 Выход</a>
+    </div>
+
+    <!-- Кнопка добавления -->
+    <button onclick="showAddForm()" class="success">➕ Добавить желание</button>
+
+    <!-- Форма добавления/редактирования -->
+    <div id="wish-form" class="card" style="display: none;">
+        <h3 id="form-title">Новое желание</h3>
+        <form id="wish-form-element">
+            <input type="hidden" id="wish-id">
+            <div class="form-group">
+                <label>Название:</label>
+                <input type="text" id="wish-title" required>
+            </div>
+            <div class="form-group">
+                <label>Ссылка:</label>
+                <input type="text" id="wish-link">
+            </div>
+            <div class="form-group">
+                <label>URL картинки:</label>
+                <input type="text" id="wish-image">
+            </div>
+            <div class="form-group">
+                <label>Цена:</label>
+                <input type="number" id="wish-price">
+            </div>
+            <button type="submit">Сохранить</button>
+            <button type="button" onclick="hideForm()">Отмена</button>
+        </form>
+    </div>
+
+    <!-- Список желаний -->
+    <div id="wishes-list"></div>
+</div>
+
+<script>
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+    if (!token) window.location.href = '/login.html';
+
+    let editingId = null;
+
+    async function loadWishes() {
+        try {
+            const response = await fetch('/wishes', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const wishes = await response.json();
+
+            const container = document.getElementById('wishes-list');
+
+            if (wishes.length === 0) {
+                container.innerHTML = '<div class="card"><p>У вас пока нет желаний. Добавьте первое!</p></div>';
+                return;
+            }
+
+            container.innerHTML = wishes.map(w => `
+                    <div class="wish-card">
+                        <h3>${escapeHtml(w.title)}</h3>
+                        ${w.link ? `<p><a href="${w.link}" target="_blank">🔗 Ссылка</a></p>` : ''}
+                        ${w.imageUrl ? `<img src="${w.imageUrl}" alt="${w.title}" class="wish-image">` : ''}
+                        <p>💰 Цена: ${w.price ? w.price + ' руб.' : 'не указана'}</p>
+                        <p>📊 Статус: <span class="${w.status === 'FREE' ? 'status-free' : 'status-booked'}">${w.status === 'FREE' ? 'Свободно' : 'Забронировано'}</span></p>
+                        <button onclick="editWish(${w.id}, '${escapeHtml(w.title)}', '${escapeHtml(w.link || '')}', '${escapeHtml(w.imageUrl || '')}', ${w.price || 0})">✏️ Редактировать</button>
+                        <button onclick="deleteWish(${w.id})" class="danger">🗑️ Удалить</button>
+                    </div>
+                `).join('');
+        } catch (error) {
+            console.error('Ошибка загрузки желаний:', error);
+            document.getElementById('wishes-list').innerHTML = '<div class="card error">Ошибка загрузки: ' + error.message + '</div>';
+        }
+    }
+
+    function showAddForm() {
+        editingId = null;
+        document.getElementById('form-title').innerText = 'Новое желание';
+        document.getElementById('wish-id').value = '';
+        document.getElementById('wish-title').value = '';
+        document.getElementById('wish-link').value = '';
+        document.getElementById('wish-image').value = '';
+        document.getElementById('wish-price').value = '';
+        document.getElementById('wish-form').style.display = 'block';
+    }
+
+    function editWish(id, title, link, imageUrl, price) {
+        editingId = id;
+        document.getElementById('form-title').innerText = 'Редактировать желание';
+        document.getElementById('wish-id').value = id;
+        document.getElementById('wish-title').value = title;
+        document.getElementById('wish-link').value = link;
+        document.getElementById('wish-image').value = imageUrl;
+        document.getElementById('wish-price').value = price;
+        document.getElementById('wish-form').style.display = 'block';
+    }
+
+    function hideForm() {
+        document.getElementById('wish-form').style.display = 'none';
+        editingId = null;
+    }
+
+    document.getElementById('wish-form-element').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        console.log('=== SUBMIT ===');
+        console.log('Editing ID:', editingId);
+
+        const wish = {
+            title: document.getElementById('wish-title').value,
+            link: document.getElementById('wish-link').value,
+            imageUrl: document.getElementById('wish-image').value,
+            price: parseInt(document.getElementById('wish-price').value) || 0
+        };
+
+        const url = editingId ? `/wishes/${editingId}` : '/wishes';
+        const method = editingId ? 'PUT' : 'POST';
+
+        console.log('URL:', url);
+        console.log('Method:', method);
+        console.log('Wish:', wish);
+
+        try {
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(wish)
+            });
+
+            console.log('Response status:', response.status);
+
+            if (response.ok) {
+                hideForm();
+                loadWishes();
+            } else {
+                const error = await response.json();
+                console.error('Error response:', error);
+                alert('Ошибка: ' + (error.error || 'Неизвестная ошибка'));
+            }
+        } catch (error) {
+            console.error('Fetch error:', error);
+            alert('Ошибка подключения к серверу: ' + error.message);
+        }
+    });
+
+    async function deleteWish(id) {
+        if (!confirm('Удалить это желание?')) return;
+
+        try {
+            const response = await fetch(`/wishes/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (response.ok) {
+                loadWishes();
+            } else {
+                alert('Ошибка удаления');
+            }
+        } catch (error) {
+            console.error('Ошибка удаления:', error);
+        }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    function logout() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/';
+    }
+
+    loadWishes();
+</script>
+</body>
+</html>

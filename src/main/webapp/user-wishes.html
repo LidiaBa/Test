@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Желания пользователя - Wish List</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="container">
+  <h1 id="page-title">🎁 Желания пользователя</h1>
+
+  <!-- Навигация -->
+  <div class="nav-bar">
+    <a href="/profile.html">🏠 Профиль</a>
+    <a href="/my-wishes.html">🎁 Мои желания</a>
+    <a href="/my-bookings.html">📦 Мои бронирования</a>
+    <a href="/for-me.html">🎀 Кто дарит мне</a>
+    <a href="/users.html">👥 Пользователи</a>
+    <a href="#" onclick="logout()">🚪 Выход</a>
+  </div>
+
+  <!-- Список желаний -->
+  <div id="wishes-list"></div>
+
+  <div id="message"></div>
+</div>
+
+<script>
+  const token = localStorage.getItem('token');
+  const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+
+  if (!token) window.location.href = '/login.html';
+
+  // Получаем параметры из URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const userId = urlParams.get('userId');
+  const userName = urlParams.get('userName');
+
+  if (userName) {
+    document.getElementById('page-title').innerText = `🎁 Желания пользователя ${userName}`;
+  }
+
+  async function loadUserWishes() {
+    if (!userId) {
+      document.getElementById('wishes-list').innerHTML = '<div class="card">Ошибка: пользователь не указан</div>';
+      return;
+    }
+
+    try {
+      const response = await fetch(`/users/${userId}/wishes`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const wishes = await response.json();
+
+      const container = document.getElementById('wishes-list');
+
+      if (wishes.length === 0) {
+        container.innerHTML = '<div class="card">У пользователя пока нет желаний</div>';
+        return;
+      }
+
+      container.innerHTML = wishes.map(w => `
+                    <div class="wish-card">
+                        <h3>${escapeHtml(w.title)}</h3>
+                        ${w.link ? `<p><a href="${w.link}" target="_blank">🔗 Ссылка</a></p>` : ''}
+                        ${w.imageUrl ? `<img src="${w.imageUrl}" alt="${w.title}" class="wish-image">` : ''}
+                        <p>💰 Цена: ${w.price ? w.price + ' руб.' : 'не указана'}</p>
+                        <p>📊 Статус: <span class="${w.status === 'FREE' ? 'status-free' : 'status-booked'}">${w.status === 'FREE' ? 'Свободно' : 'Забронировано'}</span></p>
+                        ${w.status === 'FREE' && userId != currentUser.id ?
+              `<button onclick="bookWish(${w.id})" class="success">🎁 Забронировать</button>` :
+              ''}
+                    </div>
+                `).join('');
+    } catch (error) {
+      console.error('Ошибка загрузки:', error);
+    }
+  }
+
+  async function bookWish(wishId) {
+    try {
+      const response = await fetch(`/bookings?wishId=${wishId}`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (response.status === 201) {
+        document.getElementById('message').innerHTML = '<div class="success">✅ Желание успешно забронировано!</div>';
+        setTimeout(() => {
+          document.getElementById('message').innerHTML = '';
+          loadUserWishes();
+        }, 2000);
+      } else if (response.status === 403) {
+        alert('Нельзя забронировать своё желание');
+      } else if (response.status === 409) {
+        alert('Это желание уже забронировано');
+      } else {
+        alert('Ошибка бронирования');
+      }
+    } catch (error) {
+      console.error('Ошибка:', error);
+      alert('Ошибка подключения к серверу');
+    }
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = '/';
+  }
+
+  loadUserWishes();
+</script>
+</body>
+</html>

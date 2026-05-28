@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои бронирования - Wish List</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="container">
+    <h1>📦 Мои бронирования</h1>
+
+    <!-- Навигация -->
+    <div class="nav-bar">
+        <a href="/profile.html">🏠 Профиль</a>
+        <a href="/my-wishes.html">🎁 Мои желания</a>
+        <a href="/my-bookings.html">📦 Мои бронирования</a>
+        <a href="/for-me.html">🎀 Кто дарит мне</a>
+        <a href="/users.html">👥 Пользователи</a>
+        <a href="#" onclick="logout()">🚪 Выход</a>
+    </div>
+
+    <!-- Список бронирований -->
+    <div id="bookings-list"></div>
+</div>
+
+<script>
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+    if (!token) window.location.href = '/login.html';
+
+    async function loadMyBookings() {
+        try {
+            const response = await fetch('/bookings', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const bookings = await response.json();
+
+            const container = document.getElementById('bookings-list');
+
+            if (bookings.length === 0) {
+                container.innerHTML = '<div class="card"><p>Вы ещё ничего не забронировали</p></div>';
+                return;
+            }
+
+            container.innerHTML = bookings.map(b => `
+                    <div class="booking-card">
+                        <h3>🎁 ${escapeHtml(b.wishTitle || 'Желание #' + b.wishId)}</h3>
+                        <p>👤 Владелец: ${escapeHtml(b.ownerName || 'ID: ' + b.ownerId)}</p>
+                        <p>📅 Забронировано: ${new Date(b.bookedAt).toLocaleString()}</p>
+                        <button onclick="cancelBooking(${b.wishId})" class="danger">❌ Отменить бронирование</button>
+                    </div>
+                `).join('');
+        } catch (error) {
+            console.error('Ошибка загрузки:', error);
+            document.getElementById('bookings-list').innerHTML = '<div class="card error">Ошибка загрузки</div>';
+        }
+    }
+
+    async function cancelBooking(wishId) {
+        if (!confirm('Отменить бронирование?')) return;
+
+        try {
+            const response = await fetch(`/bookings?wishId=${wishId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (response.ok) {
+                alert('Бронирование отменено');
+                loadMyBookings();
+            } else {
+                alert('Ошибка отмены');
+            }
+        } catch (error) {
+            console.error('Ошибка:', error);
+            alert('Ошибка подключения к серверу');
+        }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    function logout() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/';
+    }
+
+    loadMyBookings();
+</script>
+</body>
+</html>

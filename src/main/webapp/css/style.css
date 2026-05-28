@@ -1,0 +1,135 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+h1 {
+    color: white;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Карточки */
+.card, .wish-card, .user-card, .booking-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* Навигация */
+.nav-bar {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.nav-bar a {
+    color: #667eea;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+}
+
+.nav-bar a:hover {
+    background: #667eea;
+    color: white;
+}
+
+/* Формы */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: bold;
+}
+
+.form-group input, .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+button {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 5px;
+}
+
+button:hover {
+    background: #5a67d8;
+}
+
+button.danger {
+    background: #e53e3e;
+}
+
+button.danger:hover {
+    background: #c53030;
+}
+
+button.success {
+    background: #48bb78;
+}
+
+/* Статусы */
+.status-free {
+    color: #48bb78;
+    font-weight: bold;
+}
+
+.status-booked {
+    color: #e53e3e;
+    font-weight: bold;
+}
+
+/* Ошибки и успехи */
+.error {
+    color: #e53e3e;
+    margin-top: 10px;
+    padding: 10px;
+    background: #fff5f5;
+    border-radius: 5px;
+}
+
+.success {
+    color: #48bb78;
+    margin-top: 10px;
+    padding: 10px;
+    background: #f0fff4;
+    border-radius: 5px;
+}
+
+/* Сетка для карточек */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}

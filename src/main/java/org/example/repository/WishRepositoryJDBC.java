@@ -5,6 +5,7 @@ import org.example.dto.Wish;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,18 +15,25 @@ public class WishRepositoryJDBC implements WishRepository {
     private final DatabaseConnection connection = DatabaseConnection.getInstance();
     @Override
     public Wish create(Wish wish) {
-        try(var st=connection.getStatement()) {
-            String q =  String.format("insert into wishes (title, link, image_url, status, price,user_id) values ('%s', '%s', '%s', '%s','%d','%d')",
+        try (var st = connection.getStatement()) {
+            String q = String.format("INSERT INTO wishes (title, link, image_url, status, price, user_id) VALUES ('%s', '%s', '%s', '%s', %d, %d)",
                     wish.getTitle(),
-                    wish.getLink(),
-                    wish.getImageUrl(),
-                    wish.getStatus(),
-                    wish.getPrice(),
+                    wish.getLink() != null ? wish.getLink() : "",
+                    wish.getImageUrl() != null ? wish.getImageUrl() : "",
+                    wish.getStatus() != null ? wish.getStatus() : "FREE",
+                    wish.getPrice() != null ? wish.getPrice() : 0,
                     wish.getUserId());
             log.debug(q);
-            try (var rs = st.executeQuery(q)) {
-                if (rs.rowInserted()) {
-                    wish.setId(st.getGeneratedKeys().getLong(1));
+
+            int affected = st.executeUpdate(q, Statement.RETURN_GENERATED_KEYS);
+            System.out.println("Affected rows: " + affected);
+
+            if (affected > 0) {
+                try (var rs = st.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        wish.setId(rs.getLong(1));
+                        System.out.println("Generated ID: " + wish.getId());
+                    }
                 }
             }
             return wish;

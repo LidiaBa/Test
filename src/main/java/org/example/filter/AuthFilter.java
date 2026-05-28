@@ -13,11 +13,11 @@ import org.example.repository.AuthStorage;
 import java.io.IOException;
 import java.util.Set;
 
-@WebFilter({"/hello", "/user", "/wishes/*", "/bookings/*"})
+@WebFilter({"/hello", "/user/*","/user", "/users/*", "/wishes/*", "/bookings/*"})
 
 @Log4j2
 public class AuthFilter implements Filter {
-    private static final Set<String> PUBLIC_PATHS = Set.of("/auth");
+    private static final Set<String> PUBLIC_PATHS = Set.of("/auth","/register");
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
@@ -36,6 +36,7 @@ public class AuthFilter implements Filter {
         }
 
         AuthStorage.currentUser.set(usr);
+        req.setAttribute("userRole", usr.getRoles());
         req.setAttribute("userId", usr.getId());
         req.setAttribute("userid", usr);
         log.debug(usr);

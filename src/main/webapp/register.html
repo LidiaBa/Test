@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Регистрация - Wish List</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="container">
+  <h1>📝 Регистрация</h1>
+
+  <form id="register-form">
+    <div class="form-group">
+      <label>Логин:</label>
+      <input type="text" id="login" required>
+    </div>
+    <div class="form-group">
+      <label>Пароль:</label>
+      <input type="password" id="password" required>
+    </div>
+    <div class="form-group">
+      <label>Имя:</label>
+      <input type="text" id="name" required>
+    </div>
+    <button type="submit">Зарегистрироваться</button>
+    <p><a href="/login.html">Уже есть аккаунт? Войти</a></p>
+    <div id="error-message" class="error"></div>
+    <div id="success-message" class="success"></div>
+  </form>
+</div>
+
+<script>
+  document.getElementById('register-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const login = document.getElementById('login').value;
+    const password = document.getElementById('password').value;
+    const name = document.getElementById('name').value;
+
+    // Очищаем сообщения
+    document.getElementById('error-message').innerText = '';
+    document.getElementById('success-message').innerText = '';
+
+    try {
+      // ✅ Исправлено: запрос на /register, а не на /user
+      const response = await fetch('/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ login, password, name, roles: 'USER' })
+      });
+
+      if (response.ok) {
+        const user = await response.json();
+        document.getElementById('success-message').innerText = `✅ Регистрация успешна! Добро пожаловать, ${user.name}!`;
+        document.getElementById('success-message').style.display = 'block';
+
+        // Перенаправляем на страницу входа через 2 секунды
+        setTimeout(() => {
+          window.location.href = '/login.html';
+        }, 2000);
+      } else {
+        const error = await response.json();
+        document.getElementById('error-message').innerText = error.error || 'Ошибка регистрации';
+        document.getElementById('error-message').style.display = 'block';
+      }
+    } catch (error) {
+      console.error('Ошибка:', error);
+      document.getElementById('error-message').innerText = '❌ Ошибка подключения к серверу. Убедитесь, что сервер запущен.';
+      document.getElementById('error-message').style.display = 'block';
+    }
+  });
+</script>
+</body>
+</html>

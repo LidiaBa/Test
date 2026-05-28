@@ -53,11 +53,7 @@ public class BookingServiceImpl implements BookingService{
                 .userId(currentUserId)
                 .ownerId(wish.getUserId())
                 .build();
-        System.out.println("Creating booking...");
         booking = bookingRepository.create(booking);
-        System.out.println("=== BookingServiceImpl.book ===");
-        System.out.println("Wish ID to book: " + wishId);
-        System.out.println("Current status: " + wish.getStatus());
 
         // Меняем статус желания на BOOKED
         wishRepository.updateStatus(wishId, "BOOKED");

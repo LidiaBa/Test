@@ -54,8 +54,9 @@ public class UserServlet extends HttpServlet {
 
     @Override
     public void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setCharacterEncoding("UTF-8");
+        req.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json;charset=UTF-8");
+        resp.setCharacterEncoding("UTF-8");
         Long id = Url.getId(req.getRequestURI());
         if (id == null) {
             resp.setStatus(400);
