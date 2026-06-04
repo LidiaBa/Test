@@ -8,16 +8,15 @@
 </head>
 <body>
 <div class="container">
-    <h1>👤 Личный кабинет</h1>
+    <h1> Личный кабинет</h1>
 
     <!-- Навигация -->
     <div class="nav-bar">
-        <a href="/profile.html">🏠 Профиль</a>
-        <a href="/my-wishes.html">🎁 Мои желания</a>
-        <a href="/my-bookings.html">📦 Мои бронирования</a>
-        <a href="/for-me.html">🎀 Кто дарит мне</a>
-        <a href="/users.html">👥 Пользователи</a>
-        <a href="#" onclick="logout()">🚪 Выход</a>
+        <a href="/profile.html">Профиль</a>
+        <a href="/my-wishes.html">Мои желания</a>
+        <a href="/my-bookings.html">Мои бронирования</a>
+        <a href="/users.html">Пользователи</a>
+        <a href="#" onclick="logout()">Выход</a>
     </div>
 
     <!-- Информация о пользователе -->
@@ -25,12 +24,11 @@
         <h2>Информация о профиле</h2>
         <div class="profile-info">
             <p><strong>ID:</strong> <span id="user-id"></span></p>
-            <p><strong>Логин:</strong> <span id="user-login"></span></p>
             <p><strong>Имя:</strong> <span id="user-name"></span></p>
             <p><strong>Роль:</strong> <span id="user-role"></span></p>
         </div>
 
-        <button onclick="showEditForm()">✏️ Редактировать профиль</button>
+        <button class="success" onclick="showEditForm()"> Редактировать профиль</button>
     </div>
 
     <!-- Форма редактирования (скрыта по умолчанию) -->
@@ -45,19 +43,18 @@
                 <label>Новый пароль (оставьте пустым, если не хотите менять):</label>
                 <input type="password" id="edit-password">
             </div>
-            <button type="submit">Сохранить</button>
-            <button type="button" onclick="hideEditForm()">Отмена</button>
+            <button type="submit" class="success">Сохранить</button>
+            <button type="button" class="danger" onclick="hideEditForm()">Отмена</button>
         </form>
         <div id="edit-message" class="error"></div>
     </div>
 
     <!-- Статистика -->
     <div class="card">
-        <h2>📊 Моя статистика</h2>
+        <h2>Моя статистика</h2>
         <div class="stats">
-            <p>🎁 Моих желаний: <span id="my-wishes-count">0</span></p>
-            <p>📦 Забронировано мной: <span id="my-bookings-count">0</span></p>
-            <p>🎀 Забронировано у меня: <span id="for-me-count">0</span></p>
+            <p>Моих желаний: <span id="my-wishes-count">0</span></p>
+            <p>Забронировано мной: <span id="my-bookings-count">0</span></p>
         </div>
     </div>
 </div>
@@ -81,7 +78,7 @@
             if (response.ok) {
                 const userData = await response.json();
                 document.getElementById('user-id').innerText = userData.id;
-                document.getElementById('user-login').innerText = userData.login;
+              //  document.getElementById('user-login').innerText = userData.login;
                 document.getElementById('user-name').innerText = userData.name;
                 document.getElementById('user-role').innerText = userData.roles || 'USER';
             }
@@ -106,13 +103,6 @@
             });
             const myBookings = await myBookingsRes.json();
             document.getElementById('my-bookings-count').innerText = myBookings.length;
-
-            // Кто дарит мне
-            const forMeRes = await fetch('/bookings/for-me', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const forMe = await forMeRes.json();
-            document.getElementById('for-me-count').innerText = forMe.length;
 
         } catch (error) {
             console.error('Ошибка загрузки статистики:', error);
@@ -158,7 +148,7 @@
                 user.name = updatedUser.name;
                 localStorage.setItem('user', JSON.stringify(user));
                 document.getElementById('user-name').innerText = user.name;
-                document.getElementById('edit-message').innerHTML = '<span class="success">✅ Профиль обновлён!</span>';
+                document.getElementById('edit-message').innerHTML = '<span class="success"> Профиль обновлён!</span>';
                 setTimeout(() => hideEditForm(), 1500);
             } else {
                 const error = await response.json();

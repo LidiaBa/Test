@@ -8,37 +8,33 @@
 </head>
 <body>
 <div class="container">
-  <h1 id="page-title">🎁 Желания пользователя</h1>
+  <h1 id="page-title"> Желания пользователя</h1>
 
-  <!-- Навигация -->
   <div class="nav-bar">
-    <a href="/profile.html">🏠 Профиль</a>
-    <a href="/my-wishes.html">🎁 Мои желания</a>
-    <a href="/my-bookings.html">📦 Мои бронирования</a>
-    <a href="/for-me.html">🎀 Кто дарит мне</a>
-    <a href="/users.html">👥 Пользователи</a>
-    <a href="#" onclick="logout()">🚪 Выход</a>
+    <a href="/profile.html">Профиль</a>
+    <a href="/my-wishes.html">Мои желания</a>
+    <a href="/my-bookings.html">Мои бронирования</a>
+    <a href="/users.html">Пользователи</a>
+    <a href="#" onclick="logout()">Выход</a>
   </div>
 
-  <!-- Список желаний -->
   <div id="wishes-list"></div>
-
   <div id="message"></div>
 </div>
 
 <script>
   const token = localStorage.getItem('token');
   const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+  const isAdmin = currentUser.roles === 'ADMIN';
 
   if (!token) window.location.href = '/login.html';
 
-  // Получаем параметры из URL
   const urlParams = new URLSearchParams(window.location.search);
   const userId = urlParams.get('userId');
   const userName = urlParams.get('userName');
 
   if (userName) {
-    document.getElementById('page-title').innerText = `🎁 Желания пользователя ${userName}`;
+    document.getElementById('page-title').innerText = ` Желания пользователя ${userName}`;
   }
 
   async function loadUserWishes() {
@@ -61,19 +57,40 @@
       }
 
       container.innerHTML = wishes.map(w => `
-                    <div class="wish-card">
-                        <h3>${escapeHtml(w.title)}</h3>
-                        ${w.link ? `<p><a href="${w.link}" target="_blank">🔗 Ссылка</a></p>` : ''}
-                        ${w.imageUrl ? `<img src="${w.imageUrl}" alt="${w.title}" class="wish-image">` : ''}
-                        <p>💰 Цена: ${w.price ? w.price + ' руб.' : 'не указана'}</p>
-                        <p>📊 Статус: <span class="${w.status === 'FREE' ? 'status-free' : 'status-booked'}">${w.status === 'FREE' ? 'Свободно' : 'Забронировано'}</span></p>
-                        ${w.status === 'FREE' && userId != currentUser.id ?
-              `<button onclick="bookWish(${w.id})" class="success">🎁 Забронировать</button>` :
-              ''}
-                    </div>
-                `).join('');
+                <div class="wish-card">
+                    <h3>${escapeHtml(w.title)}</h3>
+                    ${w.link ? `<p><a href="${w.link}" target="_blank">🔗 Ссылка</a></p>` : ''}
+                    ${w.imageUrl ? `<img src="${w.imageUrl}" alt="${w.title}" class="wish-image">` : ''}
+                    <p>Цена: ${w.price ? w.price + ' руб.' : 'не указана'}</p>
+                    <p>Статус: <span class="${w.status === 'FREE' ? 'status-free' : 'status-booked'}">${w.status === 'FREE' ? 'Свободно' : 'Забронировано'}</span></p>
+                    ${w.status === 'FREE' && userId !== currentUser.id ?
+              `<button onclick="bookWish(${w.id})" class="success"> Забронировать </button>` : ''}
+                    ${isAdmin ?
+              `<button onclick="deleteWish(${w.id})" class="danger"> Удалить желание (Админ)</button>` : ''}
+                </div>
+            `).join('');
     } catch (error) {
       console.error('Ошибка загрузки:', error);
+    }
+  }
+
+  async function deleteWish(wishId) {
+    if (!confirm('Удалить это желание?')) return;
+
+    try {
+      const response = await fetch(`/wishes/${wishId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (response.ok) {
+        alert('Желание удалено');
+        loadUserWishes();
+      } else {
+        alert('Ошибка удаления');
+      }
+    } catch (error) {
+      console.error('Ошибка:', error);
     }
   }
 
@@ -85,7 +102,7 @@
       });
 
       if (response.status === 201) {
-        document.getElementById('message').innerHTML = '<div class="success">✅ Желание успешно забронировано!</div>';
+        document.getElementById('message').innerHTML = '<div class="success">Желание успешно забронировано!</div>';
         setTimeout(() => {
           document.getElementById('message').innerHTML = '';
           loadUserWishes();
@@ -99,7 +116,6 @@
       }
     } catch (error) {
       console.error('Ошибка:', error);
-      alert('Ошибка подключения к серверу');
     }
   }
 

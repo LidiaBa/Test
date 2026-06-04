@@ -8,30 +8,27 @@
 </head>
 <body>
 <div class="container">
-  <h1>👥 Пользователи</h1>
+  <h1> Пользователи</h1>
 
-  <!-- Навигация -->
   <div class="nav-bar">
-    <a href="/profile.html">🏠 Профиль</a>
-    <a href="/my-wishes.html">🎁 Мои желания</a>
-    <a href="/my-bookings.html">📦 Мои бронирования</a>
-    <a href="/for-me.html">🎀 Кто дарит мне</a>
-    <a href="/users.html">👥 Пользователи</a>
-    <a href="#" onclick="logout()">🚪 Выход</a>
+    <a href="/profile.html">Профиль</a>
+    <a href="/my-wishes.html">Мои желания</a>
+    <a href="/my-bookings.html">Мои бронирования</a>
+    <a href="/users.html">Пользователи</a>
+    <a href="#" onclick="logout()">Выход</a>
   </div>
 
-  <!-- Поиск -->
   <div class="card">
     <input type="text" id="search" placeholder="🔍 Поиск пользователей..." class="search-input">
   </div>
 
-  <!-- Список пользователей -->
   <div id="users-list" class="grid"></div>
 </div>
 
 <script>
   const token = localStorage.getItem('token');
   const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+  const isAdmin = currentUser.roles === 'ADMIN';
 
   if (!token) window.location.href = '/login.html';
 
@@ -45,7 +42,7 @@
       allUsers = await response.json();
       renderUsers(allUsers);
     } catch (error) {
-      console.error('Ошибка загрузки пользователей:', error);
+      console.error('Ошибка загрузки:', error);
     }
   }
 
@@ -59,21 +56,41 @@
     }
 
     container.innerHTML = filtered.map(user => `
-                <div class="user-card">
-                    <h3>${escapeHtml(user.name || user.login)}</h3>
-                    <p>📌 Логин: ${escapeHtml(user.login)}</p>
-                    <p>🎭 Роль: ${user.roles || 'USER'}</p>
-                    <button onclick="viewWishes(${user.id}, '${escapeHtml(user.name || user.login)}')">🎁 Смотреть желания</button>
-                </div>
-            `).join('');
+            <div class="user-card">
+                <h3>${escapeHtml(user.name || user.login)}</h3>
+                <p>Логин: ${escapeHtml(user.login)}</p>
+                <p>Роль: ${user.roles || 'USER'}</p>
+                <button class="success" onclick="viewWishes(${user.id}, '${escapeHtml(user.name || user.login)}')"> Смотреть желания</button>
+                ${isAdmin ? `<button onclick="deleteUser(${user.id})" class="danger">Удалить пользователя</button>` : ''}
+            </div>
+        `).join('');
+  }
+
+  async function deleteUser(userId) {
+    if (!confirm('Удалить этого пользователя и все его желания?')) return;
+
+    try {
+      const response = await fetch(`/user/${userId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (response.ok) {
+        alert('Пользователь удалён');
+        loadUsers();
+      } else {
+        alert('Ошибка удаления');
+      }
+    } catch (error) {
+      console.error('Ошибка:', error);
+    }
   }
 
   function viewWishes(userId, userName) {
     window.location.href = `/user-wishes.html?userId=${userId}&userName=${encodeURIComponent(userName)}`;
   }
 
-  // Поиск
-  document.getElementById('search').addEventListener('input', (e) => {
+  document.getElementById('search')?.addEventListener('input', (e) => {
     const searchTerm = e.target.value.toLowerCase();
     const filtered = allUsers.filter(user =>
             (user.name && user.name.toLowerCase().includes(searchTerm)) ||

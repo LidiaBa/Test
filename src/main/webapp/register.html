@@ -52,7 +52,7 @@
 
       if (response.ok) {
         const user = await response.json();
-        document.getElementById('success-message').innerText = `✅ Регистрация успешна! Добро пожаловать, ${user.name}!`;
+        document.getElementById('success-message').innerText = ` Регистрация успешна! Добро пожаловать, ${user.name}!`;
         document.getElementById('success-message').style.display = 'block';
 
         // Перенаправляем на страницу входа через 2 секунды
@@ -66,7 +66,7 @@
       }
     } catch (error) {
       console.error('Ошибка:', error);
-      document.getElementById('error-message').innerText = '❌ Ошибка подключения к серверу. Убедитесь, что сервер запущен.';
+      document.getElementById('error-message').innerText = ' Ошибка подключения к серверу. Убедитесь, что сервер запущен.';
       document.getElementById('error-message').style.display = 'block';
     }
   });

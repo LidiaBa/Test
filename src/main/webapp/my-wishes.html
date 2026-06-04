@@ -8,16 +8,15 @@
 </head>
 <body>
 <div class="container">
-    <h1>🎁 Мои желания</h1>
+    <h1> Мои желания</h1>
 
     <!-- Навигация -->
     <div class="nav-bar">
-        <a href="/profile.html">🏠 Профиль</a>
-        <a href="/my-wishes.html">🎁 Мои желания</a>
-        <a href="/my-bookings.html">📦 Мои бронирования</a>
-        <a href="/for-me.html">🎀 Кто дарит мне</a>
-        <a href="/users.html">👥 Пользователи</a>
-        <a href="#" onclick="logout()">🚪 Выход</a>
+        <a href="/profile.html"> Профиль</a>
+        <a href="/my-wishes.html"> Мои желания</a>
+        <a href="/my-bookings.html"> Мои бронирования</a>
+        <a href="/users.html"> Пользователи</a>
+        <a href="#" onclick="logout()"> Выход</a>
     </div>
 
     <!-- Кнопка добавления -->
@@ -44,8 +43,8 @@
                 <label>Цена:</label>
                 <input type="number" id="wish-price">
             </div>
-            <button type="submit">Сохранить</button>
-            <button type="button" onclick="hideForm()">Отмена</button>
+            <button class="success" type="submit">Сохранить</button>
+            <button class="danger" type="button" onclick="hideForm()">Отмена</button>
         </form>
     </div>
 
@@ -80,10 +79,10 @@
                         <h3>${escapeHtml(w.title)}</h3>
                         ${w.link ? `<p><a href="${w.link}" target="_blank">🔗 Ссылка</a></p>` : ''}
                         ${w.imageUrl ? `<img src="${w.imageUrl}" alt="${w.title}" class="wish-image">` : ''}
-                        <p>💰 Цена: ${w.price ? w.price + ' руб.' : 'не указана'}</p>
-                        <p>📊 Статус: <span class="${w.status === 'FREE' ? 'status-free' : 'status-booked'}">${w.status === 'FREE' ? 'Свободно' : 'Забронировано'}</span></p>
-                        <button onclick="editWish(${w.id}, '${escapeHtml(w.title)}', '${escapeHtml(w.link || '')}', '${escapeHtml(w.imageUrl || '')}', ${w.price || 0})">✏️ Редактировать</button>
-                        <button onclick="deleteWish(${w.id})" class="danger">🗑️ Удалить</button>
+                        <p> Цена: ${w.price ? w.price + ' руб.' : 'не указана'}</p>
+                        <p> Статус: <span class="${w.status === 'FREE' ? 'status-free' : 'status-booked'}">${w.status === 'FREE' ? 'Свободно' : 'Забронировано'}</span></p>
+                        <button class="success" onclick="editWish(${w.id}, '${escapeHtml(w.title)}', '${escapeHtml(w.link || '')}', '${escapeHtml(w.imageUrl || '')}', ${w.price || 0})"> Редактировать</button>
+                        <button onclick="deleteWish(${w.id})" class="danger"> Удалить</button>
                     </div>
                 `).join('');
         } catch (error) {

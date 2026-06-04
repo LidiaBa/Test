@@ -8,16 +8,15 @@
 </head>
 <body>
 <div class="container">
-    <h1>📦 Мои бронирования</h1>
+    <h1> Мои бронирования</h1>
 
     <!-- Навигация -->
     <div class="nav-bar">
-        <a href="/profile.html">🏠 Профиль</a>
-        <a href="/my-wishes.html">🎁 Мои желания</a>
-        <a href="/my-bookings.html">📦 Мои бронирования</a>
-        <a href="/for-me.html">🎀 Кто дарит мне</a>
-        <a href="/users.html">👥 Пользователи</a>
-        <a href="#" onclick="logout()">🚪 Выход</a>
+        <a href="/profile.html">Профиль</a>
+        <a href="/my-wishes.html">Мои желания</a>
+        <a href="/my-bookings.html">Мои бронирования</a>
+        <a href="/users.html">Пользователи</a>
+        <a href="#" onclick="logout()">Выход</a>
     </div>
 
     <!-- Список бронирований -->
@@ -40,26 +39,34 @@
             const container = document.getElementById('bookings-list');
 
             if (bookings.length === 0) {
-                container.innerHTML = '<div class="card"><p>Вы ещё ничего не забронировали</p></div>';
+                container.innerHTML = '<div class="card"><p> Вы ещё ничего не забронировали</p></div>';
                 return;
             }
 
             container.innerHTML = bookings.map(b => `
-                    <div class="booking-card">
-                        <h3>🎁 ${escapeHtml(b.wishTitle || 'Желание #' + b.wishId)}</h3>
-                        <p>👤 Владелец: ${escapeHtml(b.ownerName || 'ID: ' + b.ownerId)}</p>
-                        <p>📅 Забронировано: ${new Date(b.bookedAt).toLocaleString()}</p>
-                        <button onclick="cancelBooking(${b.wishId})" class="danger">❌ Отменить бронирование</button>
+                <div class="wish-card">
+                    <div class="booking-header">
+                        <h3> ${escapeHtml(b.ownerName || 'Пользователь #' + b.ownerId)}</h3>
                     </div>
-                `).join('');
+                    <div class="wish-content">
+                        <h4> ${escapeHtml(b.wishTitle || 'Желание #' + b.wishId)}</h4>
+                        ${b.wishLink ? `<p><a href="${b.wishLink}" target="_blank">🔗 Ссылка на товар</a></p>` : ''}
+                        ${b.wishImage ? `<img src="${b.wishImage}" alt="Фото" class="wish-image">` : ''}
+                        <p> Цена: ${b.wishPrice ? b.wishPrice + ' руб.' : 'не указана'}</p>
+                    </div>
+                    <div class="wish-actions">
+                        <button onclick="cancelBooking(${b.wishId})" class="danger"> Отменить бронирование</button>
+                    </div>
+                </div>
+            `).join('');
         } catch (error) {
             console.error('Ошибка загрузки:', error);
-            document.getElementById('bookings-list').innerHTML = '<div class="card error">Ошибка загрузки</div>';
+            document.getElementById('bookings-list').innerHTML = '<div class="card error">❌ Ошибка загрузки бронирований</div>';
         }
     }
 
     async function cancelBooking(wishId) {
-        if (!confirm('Отменить бронирование?')) return;
+        if (!confirm('Отменить бронирование? Желание снова станет доступным для других пользователей.')) return;
 
         try {
             const response = await fetch(`/bookings?wishId=${wishId}`, {
@@ -68,14 +75,17 @@
             });
 
             if (response.ok) {
-                alert('Бронирование отменено');
+                alert('✅ Бронирование отменено');
                 loadMyBookings();
+                // Обновляем статистику в профиле, если нужно
+                if (window.opener) window.opener.loadStats();
             } else {
-                alert('Ошибка отмены');
+                const error = await response.json();
+                alert('❌ Ошибка: ' + (error.error || 'Неизвестная ошибка'));
             }
         } catch (error) {
             console.error('Ошибка:', error);
-            alert('Ошибка подключения к серверу');
+            alert('❌ Ошибка подключения к серверу');
         }
     }
 

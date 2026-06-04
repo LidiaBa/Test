@@ -9,22 +9,86 @@ import lombok.extern.log4j.Log4j2;
 import org.example.config.ServiceConf;
 import org.example.dto.Booking;
 
+import org.example.dto.User;
+import org.example.dto.Wish;
 import org.example.service.BookingService;
 
+import org.example.service.UserService;
+import org.example.service.WishService;
 import org.example.type.Mapper;
 import org.example.type.Url;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 @Log4j2
 @WebServlet("/bookings/*")
 
 public class BookingServlet extends HttpServlet {
     private BookingService bookingService;
-    public void init() throws ServletException {
-        bookingService = ServiceConf.get(BookingService.class);
-    }
+    // Добавьте эти поля в класс BookingServlet
+    private WishService wishService;
+    private UserService userService;
 
     @Override
+    public void init() throws ServletException {
+        bookingService = ServiceConf.get(BookingService.class);
+        wishService = ServiceConf.get(WishService.class);  // ← добавить
+        userService = ServiceConf.get(UserService.class);  // ← добавить
+    }
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        req.setCharacterEncoding("UTF-8");
+        resp.setContentType("application/json;charset=UTF-8");
+        resp.setCharacterEncoding("UTF-8");
+
+        Long userId = (Long) req.getAttribute("userId");
+        String path = req.getPathInfo();
+
+        try {
+            List<Booking> bookings;
+
+            bookings = bookingService.getMyBookings(userId);
+
+            // ✅ Преобразуем Booking в Map с дополнительными данными
+            List<Map<String, Object>> result = new ArrayList<>();
+
+            for (Booking booking : bookings) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("id", booking.getId());
+                item.put("wishId", booking.getWishId());
+                item.put("userId", booking.getUserId());
+                item.put("ownerId", booking.getOwnerId());
+
+                Wish wish = wishService.get(booking.getWishId());
+                if (wish != null) {
+                    item.put("wishTitle", wish.getTitle());
+                    item.put("wishLink", wish.getLink());
+                    item.put("wishImage", wish.getImageUrl());
+                    item.put("wishPrice", wish.getPrice());
+                }
+
+                User owner = userService.get(booking.getOwnerId());
+                if (owner != null) {
+                    item.put("ownerName", owner.getName());
+                }
+
+
+                result.add(item);
+            }
+
+            resp.getWriter().print(Mapper.objectMapper.writeValueAsString(result));
+
+        } catch (Exception e) {
+            resp.setStatus(500);
+            resp.getWriter().print("{\"error\":\"" + e.getMessage() + "\"}");
+        }
+    }
+   /* @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
@@ -45,7 +109,7 @@ public class BookingServlet extends HttpServlet {
             resp.setStatus(500);
             resp.getWriter().print("{\"error\":\"" + e.getMessage() + "\"}");
         }
-    }
+    }*/
 
     // POST /bookings?wishId={id} - забронировать желание
     @Override

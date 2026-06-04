@@ -72,21 +72,36 @@ public class UserServlet extends HttpServlet {
             resp.getWriter().print("");
         }
     }
+
     @Override
     public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json;charset=UTF-8");
         resp.setCharacterEncoding("UTF-8");
+
         Long id = Url.getId(req.getRequestURI());
+        Long userId = (Long) req.getAttribute("userId");
+        String userRole = (String) req.getAttribute("userRole");  // ← добавить
+
         if (id == null) {
             resp.setStatus(400);
-            resp.getWriter().print("");
+            resp.getWriter().print("{\"error\":\"Invalid user ID\"}");
             return;
+        }
+
+        if (!"ADMIN".equals(userRole) && !id.equals(userId)) {
+            resp.setStatus(403);
+            resp.getWriter().print("{\"error\":\"You can only delete your own account\"}");
+            return;
+        }
+
+        if ("ADMIN".equals(userRole) && id.equals(userId)) {
+            // Админ удаляет сам себя — можно разрешить, но с осторожностью
+            log.warn("Admin {} is deleting their own account", userId);
         }
 
         userService.delete(id);
         resp.setStatus(204);
-        resp.getWriter().print("");
     }
 
 }

@@ -21,6 +21,7 @@ import java.util.List;
 
 public class WishServlet extends HttpServlet {
     private WishService wishService;
+
     public void init() throws ServletException {
         wishService = ServiceConf.get(WishService.class);
     }
@@ -58,7 +59,7 @@ public class WishServlet extends HttpServlet {
             wish.setUserId(userId);
             wish = wishService.create(wish);
             resp.getWriter().print(Mapper.objectMapper.writeValueAsString(wish));
-        } catch (Exception e){
+        } catch (Exception e) {
             resp.setStatus(400);
             resp.getWriter().print("{\"error\":\"" + e.getMessage().replace("\"", "\\\"") + "\"}");
         }
@@ -92,25 +93,44 @@ public class WishServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json;charset=UTF-8");
         resp.setCharacterEncoding("UTF-8");
+
         Long id = Url.getId(req.getRequestURI());
         Long userId = (Long) req.getAttribute("userId");
+        String userRole = (String) req.getAttribute("userRole");  // ← добавить
+
         System.out.println("Wish ID: " + id);
-        System.out.println("User ID from attribute: " + userId);
+        System.out.println("User ID: " + userId);
+        System.out.println("User Role: " + userRole);
+
         if (id == null) {
             resp.setStatus(400);
-            resp.getWriter().print("");
+            resp.getWriter().print("{\"error\":\"Invalid wish ID\"}");
             return;
         }
+
         if (userId == null) {
             User user = AuthStorage.currentUser.get();
             if (user != null) {
                 userId = user.getId();
-                System.out.println("UserId from ThreadLocal: " + userId);
+                userRole = user.getRoles();
             }
         }
-        wishService.delete(id, userId);
-        resp.setStatus(204);
-        resp.getWriter().print("");
-    }
- }
 
+        try {
+            // ✅ Админ может удалить любое желание
+            if ("ADMIN".equals(userRole)) {
+                wishService.delete(id, null);  // null = не проверяем владельца
+            } else {
+                wishService.delete(id, userId);
+            }
+            resp.setStatus(204);
+        } catch (SecurityException e) {
+            resp.setStatus(403);
+            resp.getWriter().print("{\"error\":\"" + e.getMessage() + "\"}");
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.setStatus(400);
+            resp.getWriter().print("{\"error\":\"" + e.getMessage() + "\"}");
+        }
+    }
+}

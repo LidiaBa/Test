@@ -81,26 +81,23 @@ public class WishServiceImpl implements WishService{
         return wishRepository.update(wish);
     }
 
+
     @Override
     public void delete(Long id, Long currentUserId) {
         if (id == null) {
             throw new IllegalArgumentException("Wish ID is required");
         }
-        if (currentUserId == null) {
-            throw new IllegalArgumentException("User ID is required");
-        }
 
-        // Проверяем, что желание существует и пользователь — владелец
         Wish existing = get(id);
         if (existing == null) {
             throw new RuntimeException("Wish not found with id: " + id);
         }
 
-        if (!existing.getUserId().equals(currentUserId)) {
+        if (currentUserId != null && !existing.getUserId().equals(currentUserId)) {
             throw new SecurityException("You can only delete your own wishes");
         }
 
-        log.debug("Deleting wish {} by user {}", id, currentUserId);
+        log.debug("Deleting wish {} by user {}", id, currentUserId != null ? currentUserId : "ADMIN");
         wishRepository.delete(id);
     }
 
