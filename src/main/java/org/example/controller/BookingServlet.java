@@ -68,7 +68,6 @@ public class BookingServlet extends HttpServlet {
                 if (wish != null) {
                     item.put("wishTitle", wish.getTitle());
                     item.put("wishLink", wish.getLink());
-                    item.put("wishImage", wish.getImageUrl());
                     item.put("wishPrice", wish.getPrice());
                 }
 

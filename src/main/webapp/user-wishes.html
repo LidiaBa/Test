@@ -60,7 +60,6 @@
                 <div class="wish-card">
                     <h3>${escapeHtml(w.title)}</h3>
                     ${w.link ? `<p><a href="${w.link}" target="_blank">🔗 Ссылка</a></p>` : ''}
-                    ${w.imageUrl ? `<img src="${w.imageUrl}" alt="${w.title}" class="wish-image">` : ''}
                     <p>Цена: ${w.price ? w.price + ' руб.' : 'не указана'}</p>
                     <p>Статус: <span class="${w.status === 'FREE' ? 'status-free' : 'status-booked'}">${w.status === 'FREE' ? 'Свободно' : 'Забронировано'}</span></p>
                     ${w.status === 'FREE' && userId !== currentUser.id ?
@@ -102,7 +101,7 @@
       });
 
       if (response.status === 201) {
-        document.getElementById('message').innerHTML = '<div class="success">Желание успешно забронировано!</div>';
+        document.getElementById('message').innerHTML = '';
         setTimeout(() => {
           document.getElementById('message').innerHTML = '';
           loadUserWishes();

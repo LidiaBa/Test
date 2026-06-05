@@ -58,7 +58,7 @@
     container.innerHTML = filtered.map(user => `
             <div class="user-card">
                 <h3>${escapeHtml(user.name || user.login)}</h3>
-                <p>Логин: ${escapeHtml(user.login)}</p>
+
                 <p>Роль: ${user.roles || 'USER'}</p>
                 <button class="success" onclick="viewWishes(${user.id}, '${escapeHtml(user.name || user.login)}')"> Смотреть желания</button>
                 ${isAdmin ? `<button onclick="deleteUser(${user.id})" class="danger">Удалить пользователя</button>` : ''}

@@ -16,10 +16,9 @@ public class WishRepositoryJDBC implements WishRepository {
     @Override
     public Wish create(Wish wish) {
         try (var st = connection.getStatement()) {
-            String q = String.format("INSERT INTO wishes (title, link, image_url, status, price, user_id) VALUES ('%s', '%s', '%s', '%s', %d, %d)",
+            String q = String.format("INSERT INTO wishes (title, link, status, price, user_id) VALUES ('%s', '%s', '%s', %d, %d)",
                     wish.getTitle(),
                     wish.getLink() != null ? wish.getLink() : "",
-                    wish.getImageUrl() != null ? wish.getImageUrl() : "",
                     wish.getStatus() != null ? wish.getStatus() : "FREE",
                     wish.getPrice() != null ? wish.getPrice() : 0,
                     wish.getUserId());
@@ -49,7 +48,6 @@ public class WishRepositoryJDBC implements WishRepository {
                     return Wish.builder().id(rs.getLong("id"))
                             .title(rs.getString("title"))
                             .link(rs.getString("link"))
-                            .imageUrl(rs.getString("image_url"))
                             .status(rs.getString("status"))
                             .price(rs.getInt("price"))
                             .userId(rs.getLong("user_Id")).build();
@@ -71,7 +69,6 @@ public class WishRepositoryJDBC implements WishRepository {
                     wishes.add(Wish.builder().id(rs.getLong( "id")).
                             title(rs.getString( "title"))
                             .link(rs.getString( "link"))
-                            .imageUrl(rs.getString( "image_url"))
                             .status(rs.getString( "status"))
                             .price(rs.getInt( "price"))
                             .userId(rs.getLong( "user_id")).build());
@@ -86,15 +83,10 @@ public class WishRepositoryJDBC implements WishRepository {
     @Override
     public Wish update(Wish wish) {
         try(var st=connection.getStatement()) {
-            String statusSql = "";
-            if (wish.getStatus() != null) {
-                statusSql = String.format(", status = '%s'", wish.getStatus());
-            }
-            String q = String.format("update wishes set title = '%s', link = '%s', image_url = '%s'%s, price = '%d', user_id = '%d' where id = '%d'",
+
+            String q = String.format("update wishes set title = '%s', link = '%s', price = %d, user_id = %d where id = %d",
                     wish.getTitle(),
                     wish.getLink() != null ? wish.getLink() : "null",
-                    wish.getImageUrl() != null ? wish.getImageUrl() : "null",
-                    statusSql,
                     wish.getPrice(),
                     wish.getUserId(),
                     wish.getId());
@@ -143,7 +135,6 @@ public class WishRepositoryJDBC implements WishRepository {
                     wishes.add(Wish.builder().id(rs.getLong("id"))
                             .title(rs.getString("title"))
                             .link(rs.getString("link"))
-                            .imageUrl(rs.getString("image_url"))
                             .status(rs.getString( "status"))
                             .price(rs.getInt( "price"))
                             .userId(rs.getLong("user_id")).build());

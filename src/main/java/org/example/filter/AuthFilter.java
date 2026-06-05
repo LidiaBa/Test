@@ -21,8 +21,10 @@ public class AuthFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
-        //HttpServletResponse res = (HttpServletResponse) servletResponse;
-
+        HttpServletResponse res = (HttpServletResponse) servletResponse;
+        req.setCharacterEncoding("UTF-8");
+        res.setCharacterEncoding("UTF-8");
+        res.setContentType("application/json;charset=UTF-8");
         String auth = req.getHeader("Authorization");
         if (auth == null || auth.isEmpty()) {
             throw  new MyServletException(servletResponse, 401, "Authorization error");
