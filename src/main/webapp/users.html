@@ -58,8 +58,6 @@
     container.innerHTML = filtered.map(user => `
             <div class="user-card">
                 <h3>${escapeHtml(user.name || user.login)}</h3>
-
-                <p>Роль: ${user.roles || 'USER'}</p>
                 <button class="success" onclick="viewWishes(${user.id}, '${escapeHtml(user.name || user.login)}')"> Смотреть желания</button>
                 ${isAdmin ? `<button onclick="deleteUser(${user.id})" class="danger">Удалить пользователя</button>` : ''}
             </div>
@@ -93,8 +91,7 @@
   document.getElementById('search')?.addEventListener('input', (e) => {
     const searchTerm = e.target.value.toLowerCase();
     const filtered = allUsers.filter(user =>
-            (user.name && user.name.toLowerCase().includes(searchTerm)) ||
-            (user.login && user.login.toLowerCase().includes(searchTerm))
+            (user.name && user.name.toLowerCase().includes(searchTerm))
     );
     renderUsers(filtered);
   });

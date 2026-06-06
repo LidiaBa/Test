@@ -12,7 +12,7 @@ import java.util.StringTokenizer;
 @AllArgsConstructor
 public class Booking {
     private Long id;
-    private Long wishId;               // Какое желание забронировали
-    private Long userId;               // Кто забронировал (подарит)
-    private Long ownerId;              // Кому принадлежит желание (для быстрого доступа)
+    private Long wishId;
+    private Long userId;
+    private Long ownerId;
 }

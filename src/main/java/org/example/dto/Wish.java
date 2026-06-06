@@ -13,10 +13,10 @@ import java.util.StringTokenizer;
 
 public class Wish {
     private Long id;
-    private String title;              // "Новый ноутбук"
-    private String link;               // Ссылка на товар
-    private Integer price;             // Цена (опционально)
-    private String status;             // FREE, BOOKED
-    private Long userId;               // Владелец желания
+    private String title;
+    private String link;
+    private Integer price;
+    private String status;
+    private Long userId;
 }
 

@@ -26,7 +26,7 @@
         <div class="profile-info">
             <p><strong>ID:</strong> <span id="user-id"></span></p>
             <p><strong>Имя:</strong> <span id="user-name"></span></p>
-            <p><strong>Роль:</strong> <span id="user-role"></span></p>
+
         </div>
 
         <button class="success" onclick="showEditForm()"> Редактировать профиль</button>
@@ -81,7 +81,7 @@
                 document.getElementById('user-id').innerText = userData.id;
               //  document.getElementById('user-login').innerText = userData.login;
                 document.getElementById('user-name').innerText = userData.name;
-                document.getElementById('user-role').innerText = userData.roles || 'USER';
+               // document.getElementById('user-role').innerText = userData.roles || 'USER';
             }
         } catch (error) {
             console.error('Ошибка загрузки профиля:', error);

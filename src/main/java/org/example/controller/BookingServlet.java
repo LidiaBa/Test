@@ -35,8 +35,8 @@ public class BookingServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         bookingService = ServiceConf.get(BookingService.class);
-        wishService = ServiceConf.get(WishService.class);  // ← добавить
-        userService = ServiceConf.get(UserService.class);  // ← добавить
+        wishService = ServiceConf.get(WishService.class);
+        userService = ServiceConf.get(UserService.class);
     }
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -53,8 +53,6 @@ public class BookingServlet extends HttpServlet {
             List<Booking> bookings;
 
             bookings = bookingService.getMyBookings(userId);
-
-            // ✅ Преобразуем Booking в Map с дополнительными данными
             List<Map<String, Object>> result = new ArrayList<>();
 
             for (Booking booking : bookings) {

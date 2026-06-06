@@ -27,15 +27,8 @@ public class Main {
         tomcat.setBaseDir(createTempDir("temp"));
         tomcat.getConnector();
         String contextPath = "";
-        // String docBase = new File(".").getAbsolutePath();
         String webappDir = new File("src/main/webapp/").getAbsolutePath();
         Context ctx = tomcat.addWebapp(contextPath, webappDir);
-        // будем искать все сервелеты отталкиваясь от нашего мейн класса, все грубже пакета org.example;
-       // ctx.addLifecycleListener(new ContextConfig());
-       // ctx.setParentClassLoader(Main.class.getClassLoader());
-
-        // Tomcat.addServlet(ctx, "myServelet", new HelloController());
-        // ctx.addServletMappingDecoded("/hello", "myServelet");
 
         File additionWebInfClasses = new File("target/classes");
         WebResourceRoot resources = new StandardRoot(ctx);

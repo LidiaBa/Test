@@ -40,16 +40,3 @@ public class ServiceConf {
     }
 }
 
-/*public class ServiceConf {  // 2 usages
-    private final static Map<Class<?>, Object> storage = new ConcurrentHashMap<>();
-
-    static {
-        storage.put(PersonRepository.class, new PersonRepositoryJDBC());
-        storage.put(PersonService.class, new BookingServiceImpl(get(PersonRepository.class)));
-    }
-
-    public static <T> T get(Class<T> tClass) {  // 1 usage
-        if (!storage.containsKey(tClass)) return null;
-        return (T)storage.get(tClass);
-    }
-} */
